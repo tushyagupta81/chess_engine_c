@@ -3,6 +3,7 @@
 
 typedef enum {
   ValuePiece,
+  ValueArray,
 } ValueTypes;
 
 #endif // !TYPES_H

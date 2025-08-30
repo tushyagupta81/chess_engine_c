@@ -4,7 +4,7 @@
 #include "types.h"
 #include <stdint.h>
 
-#define MIN_LEN 64
+#define MIN_LEN 8
 
 typedef struct {
   void *values;
@@ -13,9 +13,12 @@ typedef struct {
   int elem_size;
 } Array;
 
-Array* new_array(ValueTypes type);
+Array *new_array(ValueTypes type);
 void append(Array *array, void *token);
 void pop(Array *array);
-void set_at(Array *array, void* token, uint16_t index);
+void set_at(Array *array, void *token, uint16_t index);
+void *get_at(Array *array, uint16_t index);
+void *get_at_2d(Array *array, uint16_t i, uint16_t j);
+void set_at_2d(Array *array, void *token, uint16_t i, uint16_t j);
 
 #endif // !MEMORY_H

@@ -2,6 +2,7 @@
 #define PIECES_H
 
 typedef enum {
+  Blank,
   WhitePawn,
   WhiteRook,
   WhiteBishop,
@@ -15,5 +16,10 @@ typedef enum {
   BlackQueen,
   BlackKing,
 } Pieces;
+
+typedef enum {
+  White,
+  Black,
+} Player;
 
 #endif // !PIECES_H
