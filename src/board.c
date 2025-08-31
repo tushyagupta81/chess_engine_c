@@ -4,6 +4,8 @@
 #include "types.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 Board *new_board(char *fen) {
   Board *board = (Board *)malloc(sizeof(Board));
@@ -16,6 +18,7 @@ Board *new_board(char *fen) {
     append(board->board, &row);
   }
 
+  // Basic board Pieces
   int i = 0;
   int l = 0;
   int j = 0;
@@ -58,8 +61,8 @@ Board *new_board(char *fen) {
       set_at_2d(board->board, (Pieces[]){BlackKing}, i, j);
       break;
     case '1' ... '8':
-      for(int k=0;k<fen[i]-l;k++){
-        set_at_2d(board->board, (Pieces[]){Blank}, i, j+k);
+      for (int k = 0; k < fen[i] - l; k++) {
+        set_at_2d(board->board, (Pieces[]){Blank}, i, j + k);
       }
       j += fen[l] - '0';
       break;
@@ -75,7 +78,70 @@ Board *new_board(char *fen) {
     l += 1;
   }
 
-  board->check_move = false;
-  board->player = White;
+  if (fen[l] == '\0') {
+    fprintf(stderr, "Invalid FEN string. No player input\n");
+    exit(1);
+  }
+
+  // Next move player
+  board->player = fen[++l] == 'b' ? Black : White;
+
+  // Castling rights
+  l += 2;
+  int start = l;
+  while (fen[l] != ' ' && fen[l] != '\0') {
+    l++;
+  }
+  if (fen[l] == '\0') {
+    fprintf(stderr, "Invalid FEN string. No castling information\n");
+    exit(1);
+  }
+
+  board->castling = (char *)malloc(sizeof(char) * 4);
+  memcpy(board->castling, fen + start, l - start);
+
+  // En passant information
+  l += 1;
+  start = l;
+  while (fen[l] != ' ' && fen[l] != '\0') {
+    l++;
+  }
+  if (fen[l] == '\0') {
+    fprintf(stderr, "Invalid FEN string. No enpassent information\n");
+    exit(1);
+  }
+
+  board->enpassant = (char *)malloc(sizeof(char) * 2);
+  memcpy(board->enpassant, fen + start, l - start);
+
+  // Halfmoves
+  l += 1;
+  start = l;
+  while (fen[l] != ' ' && fen[l] != '\0') {
+    l++;
+  }
+  if (fen[l] == '\0') {
+    fprintf(stderr, "Invalid FEN string. No halfmoves information\n");
+    exit(1);
+  }
+
+  char *temp = malloc(sizeof(char)*(l-start));
+  memcpy(temp, fen+start, l-start);
+  board->halfmoves = atoi(temp);
+  free(temp);
+
+  // Fullmoves
+  l += 1;
+  start = l;
+  while (fen[l] != '\0') {
+    l++;
+  }
+  if (start==l) {
+    fprintf(stderr, "Invalid FEN string. No fullmoves information\n");
+    exit(1);
+  }
+
+  board->fullmoves = atoi(fen+start);
+
   return board;
 }

@@ -3,10 +3,15 @@
 #include "pieces.h"
 #include "tests.h"
 #include "unity.h"
-#include <stdio.h>
+#include <string.h>
 
 void test_board(void) {
-  Board *board = new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+  Board *board = new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
+  TEST_ASSERT_EQUAL(strcmp("KQkq", board->castling) == 0, true);
+  TEST_ASSERT_EQUAL(strcmp("-", board->enpassant) == 0, true);
+  TEST_ASSERT_EQUAL(White, board->player);
+  TEST_ASSERT_EQUAL(0, board->halfmoves);
+  TEST_ASSERT_EQUAL(0, board->fullmoves);
   // Pawns
   for (int j = 0; j < 8; j++) {
     TEST_ASSERT_EQUAL(WhitePawn, *(Pieces *)get_at_2d(board->board, 6, j));

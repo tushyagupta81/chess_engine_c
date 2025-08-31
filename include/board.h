@@ -3,13 +3,17 @@
 
 #include "memory.h"
 #include "pieces.h"
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct {
   Array *board;
   bool check_move;
   Player player;
+  char* castling;
+  char* enpassant;
+  uint16_t halfmoves;
+  uint16_t fullmoves;
 } Board;
 
 Board *new_board(char *fen);
