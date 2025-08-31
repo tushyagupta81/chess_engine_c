@@ -3,10 +3,12 @@
 #include "pieces.h"
 #include "tests.h"
 #include "unity.h"
+#include <stdio.h>
 #include <string.h>
 
 void test_board(void) {
-  Board *board = new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
+  Board *board =
+      new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
   TEST_ASSERT_EQUAL(strcmp("KQkq", board->castling) == 0, true);
   TEST_ASSERT_EQUAL(strcmp("-", board->enpassant) == 0, true);
   TEST_ASSERT_EQUAL(White, board->player);
@@ -43,4 +45,13 @@ void test_board(void) {
       TEST_ASSERT_EQUAL(Blank, *(Pieces *)get_at_2d(board->board, i, j));
     }
   }
+}
+
+void test_moves(void) {
+  Board *board = new_board("8/8/8/3r2r1/8/8/8/8 w KQkq - 0 0");
+  Array *moves = get_moves(board, 3, 3);
+  TEST_ASSERT_EQUAL(moves->curr_length, 12);
+  board = new_board("8/8/8/3q4/8/8/8/8 w KQkq - 0 0");
+  moves = get_moves(board, 3, 3);
+  TEST_ASSERT_EQUAL(moves->curr_length, 27);
 }

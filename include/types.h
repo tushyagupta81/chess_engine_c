@@ -4,6 +4,7 @@
 typedef enum {
   ValuePiece,
   ValueArray,
+  ValuePosition,
 } ValueTypes;
 
 #endif // !TYPES_H

@@ -20,6 +20,8 @@ typedef enum {
 typedef enum {
   White,
   Black,
+  None,
+  OutOfBounds,
 } Player;
 
 #endif // !PIECES_H

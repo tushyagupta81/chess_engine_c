@@ -64,7 +64,7 @@ Board *new_board(char *fen) {
       for (int k = 0; k < fen[i] - l; k++) {
         set_at_2d(board->board, (Pieces[]){Blank}, i, j + k);
       }
-      j += fen[l] - '0';
+      j += fen[l] - '1';
       break;
     case '/':
       i += 1;

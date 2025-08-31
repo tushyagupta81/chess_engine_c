@@ -16,6 +16,15 @@ typedef struct {
   uint16_t fullmoves;
 } Board;
 
+typedef struct {
+  uint16_t row;
+  uint16_t col;
+} Position;
+
+#define INBOUNDS(r, c) ((r) < 8 && (c) < 8)
+#define GET_PIECE(r,c) *(Pieces *)get_at_2d(board->board, r, c)
+
 Board *new_board(char *fen);
+Array *get_moves(Board *board, uint16_t i, uint16_t j);
 
 #endif // !BOARD_H

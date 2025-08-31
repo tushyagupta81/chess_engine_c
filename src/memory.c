@@ -1,4 +1,5 @@
 #include "memory.h"
+#include "board.h"
 #include "pieces.h"
 #include "types.h"
 #include <stdint.h>
@@ -17,6 +18,10 @@ Array *new_array(ValueTypes type) {
   case ValueArray:
     array->elem_size = sizeof(Array *);
     array->values = (Array **)malloc(array->elem_size * MIN_LEN);
+    break;
+  case ValuePosition:
+    array->elem_size = sizeof(Position);
+    array->values = (Position *)malloc(array->elem_size * MIN_LEN);
     break;
   default:
     fprintf(stderr, "Unknow type");
