@@ -3,7 +3,6 @@
 #include "pieces.h"
 #include "tests.h"
 #include "unity.h"
-#include <stdio.h>
 #include <string.h>
 
 void test_board(void) {

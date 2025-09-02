@@ -1,4 +1,5 @@
 #include "board.h"
+#include "icons.h"
 #include "memory.h"
 #include "pieces.h"
 #include "types.h"
@@ -125,8 +126,8 @@ Board *new_board(char *fen) {
     exit(1);
   }
 
-  char *temp = malloc(sizeof(char)*(l-start));
-  memcpy(temp, fen+start, l-start);
+  char *temp = malloc(sizeof(char) * (l - start));
+  memcpy(temp, fen + start, l - start);
   board->halfmoves = atoi(temp);
   free(temp);
 
@@ -136,12 +137,47 @@ Board *new_board(char *fen) {
   while (fen[l] != '\0') {
     l++;
   }
-  if (start==l) {
+  if (start == l) {
     fprintf(stderr, "Invalid FEN string. No fullmoves information\n");
     exit(1);
   }
 
-  board->fullmoves = atoi(fen+start);
+  board->fullmoves = atoi(fen + start);
 
   return board;
+}
+
+void print_board(Board *board) {
+  for (int i = 0; i < 8; i++) {
+    // Array *row = get_at(board->board, i);
+    for (int j = 0; j < 8; j++) {
+      Pieces piece = *(Pieces *)get_at_2d(board->board, i, j);
+
+      // Choose background (chessboard pattern)
+      if ((i + j) % 2 == 0)
+        printf("\x1b[48;5;49m"); // light square
+      else
+        printf("\x1b[48;5;130m"); // dark square
+
+      // Print piece symbol
+      printf("%s ", icons[piece]);
+
+      // Reset colors
+      printf("\x1b[0m");
+    }
+    printf("\n");
+  }
+}
+
+void print_board_info(Board *board) {
+  printf("%-10s - '%s'\n", "castling", board->castling);
+  printf("%-10s - %b\n", "check_move", board->check_move);
+  printf("%-10s - %d\n", "fullmoves", board->fullmoves);
+  printf("%-10s - %d\n", "halfmoves", board->halfmoves);
+  printf("%-10s - '%s'\n", "enpassant", board->enpassant);
+  if (board->player == White) {
+    printf("%-10s - 'White'\n", "player");
+  } else {
+    printf("%-10s - 'Black'\n", "player");
+  }
 }

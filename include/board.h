@@ -10,8 +10,8 @@ typedef struct {
   Array *board;
   bool check_move;
   Player player;
-  char* castling;
-  char* enpassant;
+  char *castling;
+  char *enpassant;
   uint16_t halfmoves;
   uint16_t fullmoves;
 } Board;
@@ -22,9 +22,11 @@ typedef struct {
 } Position;
 
 #define INBOUNDS(r, c) ((r) < 8 && (c) < 8)
-#define GET_PIECE(r,c) *(Pieces *)get_at_2d(board->board, r, c)
+#define GET_PIECE(r, c) *(Pieces *)get_at_2d(board->board, r, c)
 
 Board *new_board(char *fen);
 Array *get_moves(Board *board, uint16_t i, uint16_t j);
+void print_board(Board *board);
+void print_board_info(Board *board);
 
 #endif // !BOARD_H

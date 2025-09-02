@@ -1,9 +1,9 @@
-#include "main.h"
-#include <stdio.h>
+#include "board.h"
 
 int main() {
-  wow obj = {
-      .a = 1,
-  };
-  printf("Hello world %d", obj.a);
+  Board *board =
+      new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
+  print_board(board);
+  print_board_info(board);
+  return 0;
 }
