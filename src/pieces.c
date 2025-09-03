@@ -2,6 +2,7 @@
 #include "board.h"
 #include "memory.h"
 #include "types.h"
+#include "moves.h"
 #include <stdint.h>
 
 #define ADD_MOVES(r, c)                                                        \
@@ -11,20 +12,6 @@
       append(moves, &pos);                                                     \
     }                                                                          \
   } while (0)
-
-Player get_piece_color(Board *board, uint16_t i, uint16_t j) {
-  if (!INBOUNDS(i, j)) {
-    return OutOfBounds;
-  }
-  Pieces piece = GET_PIECE(i, j);
-  if (piece == Blank) {
-    return None;
-  }
-  if (piece < 7) {
-    return White;
-  }
-  return Black;
-}
 
 void move_straight(Board *board, Array *moves, uint16_t i, uint16_t j,
                    Player enemy_color) {
@@ -114,7 +101,7 @@ Array *get_moves(Board *board, uint16_t i, uint16_t j) {
     int dr[8] = {2, 2, -2, -2, 1, 1, -1, -1};
     int dc[8] = {1, -1, 1, -1, 2, -2, 2, -2};
     for (int k = 0; k < 8; k++) {
-      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]) ;
+      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]);
       if (piece_color != White && piece_color != OutOfBounds) {
         ADD_MOVES(i + dr[k], j + dc[k]);
       }
@@ -125,7 +112,7 @@ Array *get_moves(Board *board, uint16_t i, uint16_t j) {
     int dr[8] = {2, 2, -2, -2, 1, 1, -1, -1};
     int dc[8] = {1, -1, 1, -1, 2, -2, 2, -2};
     for (int k = 0; k < 8; k++) {
-      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]) ;
+      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]);
       if (piece_color != Black && piece_color != OutOfBounds) {
         ADD_MOVES(i + dr[k], j + dc[k]);
       }
@@ -136,7 +123,7 @@ Array *get_moves(Board *board, uint16_t i, uint16_t j) {
     int dr[8] = {-1, -1, 0, 1, 1, 1, 0, -1};
     int dc[8] = {0, 1, 1, 1, 0, -1, -1, -1};
     for (int k = 0; k < 8; k++) {
-      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]) ;
+      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]);
       if (piece_color != White && piece_color != OutOfBounds) {
         ADD_MOVES(i + dr[k], j + dc[k]);
       }
@@ -147,7 +134,7 @@ Array *get_moves(Board *board, uint16_t i, uint16_t j) {
     int dr[8] = {-1, -1, 0, 1, 1, 1, 0, -1};
     int dc[8] = {0, 1, 1, 1, 0, -1, -1, -1};
     for (int k = 0; k < 8; k++) {
-      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]) ;
+      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]);
       if (piece_color != Black && piece_color != OutOfBounds) {
         ADD_MOVES(i + dr[k], j + dc[k]);
       }

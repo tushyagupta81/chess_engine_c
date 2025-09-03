@@ -181,3 +181,10 @@ void print_board_info(Board *board) {
     printf("%-10s - 'Black'\n", "player");
   }
 }
+
+bool cmp_pos(Position *a, Position *b) {
+  if (a->row == b->row && a->col == b->col) {
+    return true;
+  }
+  return false;
+}

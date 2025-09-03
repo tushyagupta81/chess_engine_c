@@ -10,5 +10,6 @@ int main() {
   RUN_TEST(test_array_2d);
   RUN_TEST(test_board);
   RUN_TEST(test_moves);
+  RUN_TEST(test_moves_notation);
   return UNITY_END();
 }

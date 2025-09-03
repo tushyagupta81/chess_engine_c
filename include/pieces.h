@@ -1,6 +1,7 @@
 #ifndef PIECES_H
 #define PIECES_H
 
+#include <stdint.h>
 typedef enum {
   Blank,
   WhitePawn,

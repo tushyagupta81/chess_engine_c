@@ -28,5 +28,6 @@ Board *new_board(char *fen);
 Array *get_moves(Board *board, uint16_t i, uint16_t j);
 void print_board(Board *board);
 void print_board_info(Board *board);
+bool cmp_pos(Position *a, Position *b);
 
 #endif // !BOARD_H

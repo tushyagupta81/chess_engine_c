@@ -5,5 +5,6 @@ void test_array_1d();
 void test_array_2d();
 void test_board();
 void test_moves();
+void test_moves_notation();
 
 #endif // !TESTS_H
