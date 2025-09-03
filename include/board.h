@@ -7,19 +7,25 @@
 #include <stdint.h>
 
 typedef struct {
+  uint16_t row;
+  uint16_t col;
+} Position;
+
+typedef struct{
+  bool valid;
+  uint16_t row;
+  uint16_t col;
+} Enpassent;
+
+typedef struct {
   Array *board;
   bool check_move;
   Player player;
   char *castling;
-  char *enpassant;
+  Enpassent enpassant;
   uint16_t halfmoves;
   uint16_t fullmoves;
 } Board;
-
-typedef struct {
-  uint16_t row;
-  uint16_t col;
-} Position;
 
 #define INBOUNDS(r, c) ((r) < 8 && (c) < 8)
 #define GET_PIECE(r, c) *(Pieces *)get_at_2d(board->board, r, c)

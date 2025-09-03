@@ -1,8 +1,8 @@
 #include "pieces.h"
 #include "board.h"
 #include "memory.h"
-#include "types.h"
 #include "moves.h"
+#include "types.h"
 #include <stdint.h>
 
 #define ADD_MOVES(r, c)                                                        \
@@ -60,21 +60,35 @@ Array *get_moves(Board *board, uint16_t i, uint16_t j) {
   case WhitePawn:
     for (int col = -1; col < 2; col++) {
       if (col == 0) {
+        if (get_piece_color(board, i - 1, j + col) == None) {
+          ADD_MOVES(i - 1, j + col);
+        }
+      } else if (get_piece_color(board, i - 1, j + col) == Black) {
+        ADD_MOVES(i - 1, j + col);
+      } else if (board->enpassant.valid && board->enpassant.row == i - 1 &&
+                 board->enpassant.col == j + col) {
         ADD_MOVES(i - 1, j + col);
       }
-      if (get_piece_color(board, i - 1, j + col) == Black) {
-        ADD_MOVES(i - 1, j + col);
-      }
+    }
+    if (i == 6) {
+      ADD_MOVES(i - 2, j);
     }
     break;
   case BlackPawn:
     for (int col = -1; col < 2; col++) {
       if (col == 0) {
+        if (get_piece_color(board, i + 1, j + col) == None) {
+          ADD_MOVES(i + 1, j + col);
+        }
+      } else if (get_piece_color(board, i + 1, j + col) == White) {
+        ADD_MOVES(i + 1, j + col);
+      } else if (board->enpassant.valid && board->enpassant.row == i + 1 &&
+                 board->enpassant.col == j + col) {
         ADD_MOVES(i + 1, j + col);
       }
-      if (get_piece_color(board, i + 1, j + col) == White) {
-        ADD_MOVES(i + 1, j + col);
-      }
+    }
+    if (i == 1) {
+      ADD_MOVES(i + 2, j);
     }
     break;
   case WhiteRook:

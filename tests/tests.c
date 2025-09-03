@@ -11,5 +11,6 @@ int main() {
   RUN_TEST(test_board);
   RUN_TEST(test_moves);
   RUN_TEST(test_moves_notation);
+  RUN_TEST(test_enpassent);
   return UNITY_END();
 }

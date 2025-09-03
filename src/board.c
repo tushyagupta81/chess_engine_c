@@ -112,8 +112,18 @@ Board *new_board(char *fen) {
     exit(1);
   }
 
-  board->enpassant = (char *)malloc(sizeof(char) * 2);
-  memcpy(board->enpassant, fen + start, l - start);
+  char *enpassent_string = (char *)malloc(sizeof(char) * 4);
+  memcpy(enpassent_string, fen + start, l - start);
+  if (strlen(enpassent_string) > 1) {
+    board->enpassant.row = 7 - (enpassent_string[0] - 'a');
+    board->enpassant.col = enpassent_string[1] - '1';
+    board->enpassant.valid = true;
+  } else {
+    board->enpassant.row = 0;
+    board->enpassant.col = 0;
+    board->enpassant.valid = false;
+  }
+  free(enpassent_string);
 
   // Halfmoves
   l += 1;
@@ -174,7 +184,8 @@ void print_board_info(Board *board) {
   printf("%-10s - %b\n", "check_move", board->check_move);
   printf("%-10s - %d\n", "fullmoves", board->fullmoves);
   printf("%-10s - %d\n", "halfmoves", board->halfmoves);
-  printf("%-10s - '%s'\n", "enpassant", board->enpassant);
+  printf("%-10s - %d %d\n", "enpassant", board->enpassant.row,
+         board->enpassant.col);
   if (board->player == White) {
     printf("%-10s - 'White'\n", "player");
   } else {

@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 void print_move(Move *move) {
@@ -124,11 +125,40 @@ void do_move(Board *board, char *move_string) {
             move.end.col);
   set_at_2d(board->board, (Pieces[]){Blank}, move.start.row, move.start.col);
 
+  if ((move.start_piece == WhitePawn || move.start_piece == BlackPawn) &&
+      (board->enpassant.valid)) {
+    if (board->enpassant.row == move.end.row &&
+        board->enpassant.col == move.end.col) {
+      if (move.start_piece == WhitePawn) {
+        set_at_2d(board->board, (Pieces[]){Blank}, move.end.row + 1,
+                  move.end.col);
+      } else {
+        set_at_2d(board->board, (Pieces[]){Blank}, move.end.row - 1,
+                  move.end.col);
+      }
+    }
+  }
+
+  if ((move.start_piece == WhitePawn || move.start_piece == BlackPawn) &&
+      (abs(move.start.row - move.end.row) == 2)) {
+    if (move.end.row < move.start.row) {
+      board->enpassant.row = move.end.row + 1;
+      board->enpassant.col = move.end.col;
+      board->enpassant.valid = true;
+    } else {
+      board->enpassant.row = move.end.row - 1;
+      board->enpassant.col = move.end.col;
+      board->enpassant.valid = true;
+    }
+  } else {
+    board->enpassant.valid = false;
+  }
+
   if (move.start_piece == WhitePawn || move.start_piece == BlackPawn) {
     board->halfmoves = 0;
   } else if (end_color == White || end_color == Black) {
     board->halfmoves = 0;
-  }else{
+  } else {
     board->halfmoves++;
   }
 
