@@ -11,7 +11,7 @@ typedef struct {
   uint16_t col;
 } Position;
 
-typedef struct{
+typedef struct {
   bool valid;
   uint16_t row;
   uint16_t col;
@@ -31,7 +31,7 @@ typedef struct {
 #define GET_PIECE(r, c) *(Pieces *)get_at_2d(board->board, r, c)
 
 Board *new_board(char *fen);
-Array *get_moves(Board *board, uint16_t i, uint16_t j);
+Array *get_moves(Array *moves, Board *board, uint16_t i, uint16_t j);
 void print_board(Board *board);
 void print_board_info(Board *board);
 bool cmp_pos(Position *a, Position *b);

@@ -2,6 +2,7 @@
 #include "memory.h"
 #include "pieces.h"
 #include "tests.h"
+#include "types.h"
 #include "unity.h"
 #include <string.h>
 
@@ -48,9 +49,11 @@ void test_board(void) {
 
 void test_moves(void) {
   Board *board = new_board("8/8/8/3r2r1/8/8/8/8 w KQkq - 0 0");
-  Array *moves = get_moves(board, 3, 3);
+  Array *moves = new_array(ValuePosition);
+  get_moves(moves, board, 3, 3);
   TEST_ASSERT_EQUAL(moves->curr_length, 12);
   board = new_board("8/8/8/3q4/8/8/8/8 w KQkq - 0 0");
-  moves = get_moves(board, 3, 3);
+  moves = new_array(ValuePosition);
+  get_moves(moves, board, 3, 3);
   TEST_ASSERT_EQUAL(moves->curr_length, 27);
 }

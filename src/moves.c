@@ -2,6 +2,7 @@
 #include "board.h"
 #include "memory.h"
 #include "pieces.h"
+#include "types.h"
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -105,7 +106,8 @@ void do_move(Board *board, char *move_string) {
   move.start_piece = GET_PIECE(move.start.row, move.start.col);
   move.end_piece = GET_PIECE(move.end.row, move.end.col);
 
-  Array *moves = get_moves(board, move.start.row, move.start.col);
+  Array *moves = new_array(ValuePosition);
+  get_moves(moves, board, move.start.row, move.start.col);
   bool found_move = false;
   for (int i = 0; i < moves->curr_length; i++) {
     Position *a = (Position *)get_at(moves, i);

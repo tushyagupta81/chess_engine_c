@@ -53,9 +53,8 @@ void move_diagonal(Board *board, Array *moves, uint16_t i, uint16_t j,
   }
 }
 
-Array *get_moves(Board *board, uint16_t i, uint16_t j) {
+Array *get_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
   Pieces piece = GET_PIECE(i, j);
-  Array *moves = new_array(ValuePosition);
   switch (piece) {
   case WhitePawn:
     for (int col = -1; col < 2; col++) {
