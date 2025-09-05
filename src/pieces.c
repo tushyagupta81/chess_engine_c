@@ -2,7 +2,6 @@
 #include "board.h"
 #include "memory.h"
 #include "moves.h"
-#include "types.h"
 #include <stdint.h>
 
 #define ADD_MOVES(r, c)                                                        \

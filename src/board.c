@@ -9,7 +9,7 @@
 #include <string.h>
 
 Board *new_board(char *fen) {
-  Board *board = (Board *)malloc(sizeof(Board));
+  Board *board = malloc(sizeof(Board));
   board->board = new_array(ValueArray);
   for (int i = 0; i < 8; i++) {
     Array *row = new_array(ValuePiece);
@@ -98,7 +98,7 @@ Board *new_board(char *fen) {
     exit(1);
   }
 
-  board->castling = (char *)malloc(sizeof(char) * 4);
+  board->castling = malloc(sizeof(char) * 4);
   memcpy(board->castling, fen + start, l - start);
 
   // En passant information
@@ -112,7 +112,7 @@ Board *new_board(char *fen) {
     exit(1);
   }
 
-  char *enpassent_string = (char *)malloc(sizeof(char) * 4);
+  char *enpassent_string = malloc(sizeof(char) * 4);
   memcpy(enpassent_string, fen + start, l - start);
   if (strlen(enpassent_string) > 1) {
     board->enpassant.row = 7 - (enpassent_string[0] - 'a');

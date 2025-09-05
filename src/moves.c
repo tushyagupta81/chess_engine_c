@@ -110,7 +110,7 @@ void do_move(Board *board, char *move_string) {
   get_moves(moves, board, move.start.row, move.start.col);
   bool found_move = false;
   for (int i = 0; i < moves->curr_length; i++) {
-    Position *a = (Position *)get_at(moves, i);
+    Position *a = get_at(moves, i);
     if (cmp_pos(a, &(move.end))) {
       found_move = true;
       break;
