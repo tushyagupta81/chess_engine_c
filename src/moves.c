@@ -195,16 +195,16 @@ void do_move(Board *board, char *move_string) {
     board->halfmoves++;
   }
 
+  if(board->player == White){
+    board->check_move = get_check_status(board, &board->blackKing);
+  }else if(board->player == Black){
+    board->check_move = get_check_status(board, &board->whiteKing);
+  }
+
   if (board->player == White) {
     board->player = Black;
   } else {
     board->player = White;
     board->fullmoves++;
-  }
-
-  if(board->player == White){
-    board->check_move = get_check_status(board, &board->blackKing);
-  }else if(board->player == Black){
-    board->check_move = get_check_status(board, &board->whiteKing);
   }
 }

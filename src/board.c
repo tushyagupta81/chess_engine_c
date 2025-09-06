@@ -216,16 +216,22 @@ Board *new_board(char *fen) {
 }
 
 void print_board(Board *board) {
+  printf("  ");
+  for (int i = 0; i < 8; i++) {
+    printf("%d ", i + 1);
+  }
+  printf("\n");
   for (int i = 0; i < 8; i++) {
     // Array *row = get_at(board->board, i);
+    printf("%c ", 'H' - i);
     for (int j = 0; j < 8; j++) {
       Pieces piece = *(Pieces *)get_at_2d(board->board, i, j);
 
       // Choose background (chessboard pattern)
       if ((i + j) % 2 == 0)
-        printf("\x1b[48;5;49m"); // light square
+        printf("\x1b[48;5;36m"); // light square
       else
-        printf("\x1b[48;5;130m"); // dark square
+        printf("\x1b[48;5;94m"); // dark square
 
       // Print piece symbol
       printf("%s ", icons[piece]);
@@ -233,8 +239,14 @@ void print_board(Board *board) {
       // Reset colors
       printf("\x1b[0m");
     }
+    printf(" %c", 'H' - i);
     printf("\n");
   }
+  printf("  ");
+  for (int i = 0; i < 8; i++) {
+    printf("%d ", i + 1);
+  }
+  printf("\n");
 }
 
 void print_board_info(Board *board) {

@@ -7,6 +7,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+void flush_stdin(void) {
+  int c;
+  while ((c = getchar()) != '\n' && c != EOF) {
+    ; // discard
+  }
+}
+
 Array *new_array(ValueTypes type) {
   Array *array = malloc(sizeof(Array));
   if (array == NULL) {
@@ -56,7 +63,7 @@ void *get_at_2d(Array *array, uint16_t i, uint16_t j) {
   if (i >= array->curr_length) {
     return NULL;
   }
-  Array *row = *(Array**)get_at(array, i);
+  Array *row = *(Array **)get_at(array, i);
   if (j >= row->curr_length) {
     return NULL;
   }
