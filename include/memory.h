@@ -14,6 +14,7 @@ typedef struct {
 } Array;
 
 Array *new_array(ValueTypes type);
+void deinit_array(Array *array);
 void append(Array *array, void *token);
 void pop(Array *array);
 void set_at(Array *array, void *token, uint16_t index);

@@ -8,8 +8,31 @@
 #include <stdlib.h>
 #include <string.h>
 
+bool get_check_status(Board *board, Position *king) {
+  Array *moves = new_array(ValuePosition);
+  get_check_moves(moves, board, king->row, king->col);
+
+  for (int i = 0; i < moves->curr_length; i++) {
+    Position *pos = get_at(moves, i);
+    Array *piece_moves = new_array(ValuePosition);
+    get_moves(piece_moves, board, pos->row, pos->col);
+    for (int j = 0; j < piece_moves->curr_length; j++) {
+      if (cmp_pos(king, get_at(piece_moves, j))) {
+        return true;
+      }
+    }
+    deinit_array(piece_moves);
+  }
+  deinit_array(moves);
+  return false;
+}
+
 Board *new_board(char *fen) {
   Board *board = malloc(sizeof(Board));
+  if (board == NULL) {
+    fprintf(stderr, "Failed to allocated memory to board\n");
+    exit(1);
+  }
   board->board = new_array(ValueArray);
   for (int i = 0; i < 8; i++) {
     Array *row = new_array(ValuePiece);
@@ -19,6 +42,7 @@ Board *new_board(char *fen) {
     append(board->board, &row);
   }
 
+  bool whiteKingPresent = false, blackKingPresent = false;
   // Basic board Pieces
   int i = 0;
   int l = 0;
@@ -41,6 +65,9 @@ Board *new_board(char *fen) {
       set_at_2d(board->board, (Pieces[]){WhiteQueen}, i, j);
       break;
     case 'K':
+      whiteKingPresent = true;
+      board->whiteKing.row = i;
+      board->whiteKing.col = j;
       set_at_2d(board->board, (Pieces[]){WhiteKing}, i, j);
       break;
     case 'p':
@@ -59,6 +86,9 @@ Board *new_board(char *fen) {
       set_at_2d(board->board, (Pieces[]){BlackQueen}, i, j);
       break;
     case 'k':
+      blackKingPresent = true;
+      board->blackKing.row = i;
+      board->blackKing.col = j;
       set_at_2d(board->board, (Pieces[]){BlackKing}, i, j);
       break;
     case '1' ... '8':
@@ -99,6 +129,10 @@ Board *new_board(char *fen) {
   }
 
   board->castling = malloc(sizeof(char) * 4);
+  if (board->castling == NULL) {
+    fprintf(stderr, "Failed to allocated memory to board->castling\n");
+    exit(1);
+  }
   memcpy(board->castling, fen + start, l - start);
 
   // En passant information
@@ -113,6 +147,10 @@ Board *new_board(char *fen) {
   }
 
   char *enpassent_string = malloc(sizeof(char) * 4);
+  if (enpassent_string == NULL) {
+    fprintf(stderr, "Failed to allocated memory to enpassent_string\n");
+    exit(1);
+  }
   memcpy(enpassent_string, fen + start, l - start);
   if (strlen(enpassent_string) > 1) {
     board->enpassant.row = 7 - (enpassent_string[0] - 'a');
@@ -123,7 +161,6 @@ Board *new_board(char *fen) {
     board->enpassant.col = 0;
     board->enpassant.valid = false;
   }
-  free(enpassent_string);
 
   // Halfmoves
   l += 1;
@@ -136,10 +173,9 @@ Board *new_board(char *fen) {
     exit(1);
   }
 
-  char *temp = malloc(sizeof(char) * (l - start));
+  char temp[l-start];
   memcpy(temp, fen + start, l - start);
   board->halfmoves = atoi(temp);
-  free(temp);
 
   // Fullmoves
   l += 1;
@@ -153,6 +189,12 @@ Board *new_board(char *fen) {
   }
 
   board->fullmoves = atoi(fen + start);
+
+  if (whiteKingPresent && board->player == White) {
+    board->check_move = get_check_status(board, &board->whiteKing);
+  } else if (blackKingPresent && board->player == Black) {
+    board->check_move = get_check_status(board, &board->blackKing);
+  }
 
   return board;
 }

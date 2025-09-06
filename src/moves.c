@@ -126,6 +126,36 @@ void do_move(Board *board, char *move_string) {
   set_at_2d(board->board, (Pieces[]){move.start_piece}, move.end.row,
             move.end.col);
   set_at_2d(board->board, (Pieces[]){Blank}, move.start.row, move.start.col);
+  if (move.start_piece == WhiteKing) {
+    board->whiteKing.row = move.end.row;
+    board->whiteKing.col = move.end.col;
+  } else if (move.start_piece == BlackKing) {
+    board->blackKing.row = move.end.row;
+    board->blackKing.col = move.end.col;
+  }
+
+  if (board->check_move == true) {
+    bool now_check;
+    if (board->player == White) {
+      now_check = get_check_status(board, &board->whiteKing);
+    } else {
+      now_check = get_check_status(board, &board->blackKing);
+    }
+    if (now_check == true) {
+      fprintf(stderr, "Your move does not solve the check\n");
+      if (move.start_piece == WhiteKing) {
+        board->whiteKing.row = move.start.row;
+        board->whiteKing.col = move.start.col;
+      } else if (move.start_piece == BlackKing) {
+        board->blackKing.row = move.start.row;
+        board->blackKing.col = move.start.col;
+      }
+      set_at_2d(board->board, &move.end_piece, move.end.row, move.end.col);
+      set_at_2d(board->board, &move.start_piece, move.start.row,
+                move.start.col);
+      return;
+    }
+  }
 
   if ((move.start_piece == WhitePawn || move.start_piece == BlackPawn) &&
       (board->enpassant.valid)) {
@@ -169,5 +199,11 @@ void do_move(Board *board, char *move_string) {
   } else {
     board->player = White;
     board->fullmoves++;
+  }
+
+  if(board->player == White){
+    board->check_move = get_check_status(board, &board->blackKing);
+  }else if(board->player == Black){
+    board->check_move = get_check_status(board, &board->whiteKing);
   }
 }

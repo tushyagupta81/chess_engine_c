@@ -9,22 +9,28 @@
 
 Array *new_array(ValueTypes type) {
   Array *array = malloc(sizeof(Array));
+  if (array == NULL) {
+    fprintf(stderr, "Failed to allocated memory to array struct\n");
+    exit(1);
+  }
 
   switch (type) {
   case ValuePiece:
     array->elem_size = sizeof(Pieces);
-    array->values = malloc(array->elem_size * MIN_LEN);
     break;
   case ValueArray:
     array->elem_size = sizeof(Array *);
-    array->values = malloc(array->elem_size * MIN_LEN);
     break;
   case ValuePosition:
     array->elem_size = sizeof(Position);
-    array->values = malloc(array->elem_size * MIN_LEN);
     break;
   default:
     fprintf(stderr, "Unknow type");
+    exit(1);
+  }
+  array->values = malloc(array->elem_size * MIN_LEN);
+  if (array->values == NULL) {
+    fprintf(stderr, "Failed to allocated memory to array\n");
     exit(1);
   }
 
@@ -32,6 +38,11 @@ Array *new_array(ValueTypes type) {
   array->max_length = MIN_LEN;
 
   return array;
+}
+
+void deinit_array(Array *array) {
+  free(array->values);
+  array = NULL;
 }
 
 void *get_at(Array *array, uint16_t index) {
@@ -45,7 +56,7 @@ void *get_at_2d(Array *array, uint16_t i, uint16_t j) {
   if (i >= array->curr_length) {
     return NULL;
   }
-  Array *row = ((Array**)array->values)[i];
+  Array *row = ((Array **)array->values)[i];
   if (j >= row->curr_length) {
     return NULL;
   }

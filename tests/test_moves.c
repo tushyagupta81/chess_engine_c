@@ -45,3 +45,16 @@ void test_enpassent(void) {
   TEST_ASSERT_EQUAL(board->enpassant.valid, false);
   TEST_ASSERT_EQUAL(Blank, *(Pieces *)get_at_2d(board->board, 3, 2));
 }
+
+void test_check(void) {
+  Board *board = new_board("4k3/8/8/8/8/8/8/4R3 b KQkq - 0 1");
+  TEST_ASSERT_EQUAL(true, board->check_move);
+  board = new_board("k7/8/8/8/8/8/8/7B b KQkq - 0 1");
+  TEST_ASSERT_EQUAL(true, board->check_move);
+  board = new_board("k6R/8/8/8/8/8/8/8 b KQkq - 0 1");
+  TEST_ASSERT_EQUAL(true, board->check_move);
+  board = new_board("k7/8/8/8/8/8/8/7Q b KQkq - 0 1");
+  TEST_ASSERT_EQUAL(true, board->check_move);
+  board = new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  TEST_ASSERT_EQUAL(false, board->check_move);
+}

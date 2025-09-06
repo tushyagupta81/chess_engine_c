@@ -7,5 +7,6 @@ void test_board();
 void test_moves();
 void test_moves_notation();
 void test_enpassent();
+void test_check(void);
 
 #endif // !TESTS_H

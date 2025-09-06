@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "moves.h"
 #include <stdint.h>
+#include <stdio.h>
 
 #define ADD_MOVES(r, c)                                                        \
   do {                                                                         \
@@ -52,7 +53,7 @@ void move_diagonal(Board *board, Array *moves, uint16_t i, uint16_t j,
   }
 }
 
-Array *get_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
+void get_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
   Pieces piece = GET_PIECE(i, j);
   switch (piece) {
   case WhitePawn:
@@ -156,5 +157,119 @@ Array *get_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
   case Blank:
     break;
   }
-  return moves;
+}
+
+void get_check_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
+  Pieces piece = GET_PIECE(i, j);
+  switch (piece) {
+  case WhiteKing: {
+    int dr[8] = {-1, -1, 0, 1, 1, 1, 0, -1};
+    int dc[8] = {0, 1, 1, 1, 0, -1, -1, -1};
+    for (int k = 0; k < 8; k++) {
+      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]);
+      if (piece_color == Black) {
+        ADD_MOVES(i + dr[k], j + dc[k]);
+      }
+    }
+    int drn[8] = {2, 2, -2, -2, 1, 1, -1, -1};
+    int dcn[8] = {1, -1, 1, -1, 2, -2, 2, -2};
+    for (int k = 0; k < 8; k++) {
+      Player piece_color = get_piece_color(board, i + drn[k], j + dcn[k]);
+      if (piece_color == Black) {
+        ADD_MOVES(i + drn[k], j + dcn[k]);
+      }
+    }
+    uint16_t old_i = i, old_j = j;
+    for (int k = -1; k < 2; k += 2) {
+      for (int m = 0; m < 2; m++) {
+        i = old_i;
+        j = old_j;
+        while (get_piece_color(board, i + (m % 2 == 0 ? 0 : k),
+                               j + (m % 2 == 0 ? k : 0)) == None) {
+          i += (m % 2 == 0 ? 0 : k);
+          j += (m % 2 == 0 ? k : 0);
+        }
+        if (get_piece_color(board, i + (m % 2 == 0 ? 0 : k),
+                            j + (m % 2 == 0 ? k : 0)) == Black) {
+          ADD_MOVES(i + (m % 2 == 0 ? 0 : k), j + (m % 2 == 0 ? k : 0));
+        }
+      }
+    }
+    i = old_i;
+    j = old_j;
+    for (int k = -1; k < 2; k += 2) {
+      for (int m = -1; m < 2; m += 2) {
+        i = old_i;
+        j = old_j;
+        while (get_piece_color(board, i + k, j + m) == None) {
+          ADD_MOVES(i + k, j + m);
+          i += k;
+          j += m;
+        }
+        if (get_piece_color(board, i + k, j + m) == Black) {
+          ADD_MOVES(i + k, j + m);
+        }
+      }
+    }
+    i = old_i;
+    j = old_j;
+    break;
+  }
+  case BlackKing: {
+    int dr[8] = {-1, -1, 0, 1, 1, 1, 0, -1};
+    int dc[8] = {0, 1, 1, 1, 0, -1, -1, -1};
+    for (int k = 0; k < 8; k++) {
+      Player piece_color = get_piece_color(board, i + dr[k], j + dc[k]);
+      if (piece_color == White) {
+        ADD_MOVES(i + dr[k], j + dc[k]);
+      }
+    }
+    int drn[8] = {2, 2, -2, -2, 1, 1, -1, -1};
+    int dcn[8] = {1, -1, 1, -1, 2, -2, 2, -2};
+    for (int k = 0; k < 8; k++) {
+      Player piece_color = get_piece_color(board, i + drn[k], j + dcn[k]);
+      if (piece_color == White) {
+        ADD_MOVES(i + drn[k], j + dcn[k]);
+      }
+    }
+    uint16_t old_i = i, old_j = j;
+    for (int k = -1; k < 2; k += 2) {
+      for (int m = 0; m < 2; m++) {
+        i = old_i;
+        j = old_j;
+        while (get_piece_color(board, i + (m % 2 == 0 ? 0 : k),
+                               j + (m % 2 == 0 ? k : 0)) == None) {
+          i += (m % 2 == 0 ? 0 : k);
+          j += (m % 2 == 0 ? k : 0);
+        }
+        if (get_piece_color(board, i + (m % 2 == 0 ? 0 : k),
+                            j + (m % 2 == 0 ? k : 0)) == White) {
+          ADD_MOVES(i + (m % 2 == 0 ? 0 : k), j + (m % 2 == 0 ? k : 0));
+        }
+      }
+    }
+    i = old_i;
+    j = old_j;
+    for (int k = -1; k < 2; k += 2) {
+      for (int m = -1; m < 2; m += 2) {
+        i = old_i;
+        j = old_j;
+        while (get_piece_color(board, i + k, j + m) == None) {
+          ADD_MOVES(i + k, j + m);
+          i += k;
+          j += m;
+        }
+        if (get_piece_color(board, i + k, j + m) == White) {
+          ADD_MOVES(i + k, j + m);
+        }
+      }
+    }
+    i = old_i;
+    j = old_j;
+    break;
+  }
+  default:
+    fprintf(stderr, "Can only generate check_moves for king\n");
+    break;
+  }
 }
