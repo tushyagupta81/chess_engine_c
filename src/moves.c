@@ -116,6 +116,7 @@ void do_move(Board *board, char *move_string) {
       break;
     }
   }
+  deinit_array(moves);
 
   if (!found_move) {
     fprintf(stderr, "Move not possible\n");

@@ -42,21 +42,21 @@ Array *new_array(ValueTypes type) {
 
 void deinit_array(Array *array) {
   free(array->values);
-  array = NULL;
+  free(array);
 }
 
 void *get_at(Array *array, uint16_t index) {
   if (index >= array->curr_length) {
     return NULL;
   }
-  return array->values + index * array->elem_size;
+  return (char *)array->values + index * array->elem_size;
 }
 
 void *get_at_2d(Array *array, uint16_t i, uint16_t j) {
   if (i >= array->curr_length) {
     return NULL;
   }
-  Array *row = ((Array **)array->values)[i];
+  Array *row = *(Array**)get_at(array, i);
   if (j >= row->curr_length) {
     return NULL;
   }
@@ -64,17 +64,19 @@ void *get_at_2d(Array *array, uint16_t i, uint16_t j) {
 }
 
 void append(Array *array, void *token) {
-  if (array->curr_length < array->max_length) {
-    char *base = array->values;
-    memcpy(base + array->curr_length * array->elem_size, token,
-           array->elem_size);
-    array->curr_length += 1;
-  } else {
-    array->values =
+  if (array->curr_length >= array->max_length) {
+    void *ptr =
         realloc(array->values, array->elem_size * array->max_length * 2);
+    if (ptr == NULL) {
+      fprintf(stderr, "Failed to expand array\n");
+      exit(1);
+    }
+    array->values = ptr;
     array->max_length *= 2;
-    append(array, token);
   }
+  char *base = array->values;
+  memcpy(base + array->curr_length * array->elem_size, token, array->elem_size);
+  array->curr_length += 1;
 }
 
 void pop(Array *array) {

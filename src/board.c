@@ -18,6 +18,9 @@ bool get_check_status(Board *board, Position *king) {
     get_moves(piece_moves, board, pos->row, pos->col);
     for (int j = 0; j < piece_moves->curr_length; j++) {
       if (cmp_pos(king, get_at(piece_moves, j))) {
+        // NOTE: You have to deinit if u early quit
+        deinit_array(piece_moves);
+        deinit_array(moves);
         return true;
       }
     }
@@ -25,6 +28,16 @@ bool get_check_status(Board *board, Position *king) {
   }
   deinit_array(moves);
   return false;
+}
+
+void deinit_board(Board *board) {
+  for (int i = 0; i < 8; i++) {
+    Array *row = *(Array **)get_at(board->board, i);
+    deinit_array(row); // free row->values
+  }
+  deinit_array(board->board); // free outer array->values
+  free(board->castling);
+  free(board);
 }
 
 Board *new_board(char *fen) {
@@ -128,12 +141,13 @@ Board *new_board(char *fen) {
     exit(1);
   }
 
-  board->castling = malloc(sizeof(char) * 4);
+  board->castling = malloc(sizeof(char) * 5);
   if (board->castling == NULL) {
     fprintf(stderr, "Failed to allocated memory to board->castling\n");
     exit(1);
   }
   memcpy(board->castling, fen + start, l - start);
+  board->castling[l - start] = '\0';
 
   // En passant information
   l += 1;
@@ -152,7 +166,7 @@ Board *new_board(char *fen) {
     exit(1);
   }
   memcpy(enpassent_string, fen + start, l - start);
-  if (strlen(enpassent_string) > 1) {
+  if (l - start > 1) {
     board->enpassant.row = 7 - (enpassent_string[0] - 'a');
     board->enpassant.col = enpassent_string[1] - '1';
     board->enpassant.valid = true;
@@ -161,6 +175,7 @@ Board *new_board(char *fen) {
     board->enpassant.col = 0;
     board->enpassant.valid = false;
   }
+  free(enpassent_string);
 
   // Halfmoves
   l += 1;
@@ -173,8 +188,9 @@ Board *new_board(char *fen) {
     exit(1);
   }
 
-  char temp[l-start];
+  char temp[l - start + 1];
   memcpy(temp, fen + start, l - start);
+  temp[l - start] = '\0';
   board->halfmoves = atoi(temp);
 
   // Fullmoves

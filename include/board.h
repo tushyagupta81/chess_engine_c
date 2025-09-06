@@ -33,6 +33,7 @@ typedef struct {
 #define GET_PIECE(r, c) *(Pieces *)get_at_2d(board->board, r, c)
 
 Board *new_board(char *fen);
+void deinit_board(Board *board);
 void get_moves(Array *moves, Board *board, uint16_t i, uint16_t j);
 void get_check_moves(Array *moves, Board *board, uint16_t i, uint16_t j);
 bool get_check_status(Board *board, Position *king);

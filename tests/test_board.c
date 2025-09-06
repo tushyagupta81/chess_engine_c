@@ -45,6 +45,7 @@ void test_board(void) {
       TEST_ASSERT_EQUAL(Blank, *(Pieces *)get_at_2d(board->board, i, j));
     }
   }
+  deinit_board(board);
 }
 
 void test_moves(void) {
@@ -52,8 +53,12 @@ void test_moves(void) {
   Array *moves = new_array(ValuePosition);
   get_moves(moves, board, 3, 3);
   TEST_ASSERT_EQUAL(moves->curr_length, 12);
+  deinit_array(moves);
+  deinit_board(board);
   board = new_board("8/8/8/3q4/8/8/8/8 w KQkq - 0 0");
   moves = new_array(ValuePosition);
   get_moves(moves, board, 3, 3);
   TEST_ASSERT_EQUAL(moves->curr_length, 27);
+  deinit_array(moves);
+  deinit_board(board);
 }
