@@ -6,8 +6,8 @@
 
 int main() {
   Board *board =
-      // new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
-      new_board("6k1/5ppp/8/8/8/8/8/R6K w KQkq - 0 15");
+      new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
+      // new_board("6k1/5ppp/8/8/8/8/8/R6K w KQkq - 0 15");
   print_board(board);
   print_board_info(board);
   char input[5 + 1];

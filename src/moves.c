@@ -170,6 +170,12 @@ void do_move(Board *board, char *move_string) {
   }
 
   Player start_color = get_piece_color(board, move.start.row, move.start.col);
+  if (start_color == None) {
+    fprintf(stderr, "Please choose a piece to move\n");
+    fprintf(stderr, "Invalid move: '%s'\n", move_string);
+    return;
+  }
+
   if (start_color != board->player) {
     fprintf(stderr, "You can only use your own pieces\n");
     fprintf(stderr, "Invalid move: '%s'\n", move_string);
@@ -225,6 +231,18 @@ void do_move(Board *board, char *move_string) {
     }
     if (now_check == true) {
       fprintf(stderr, "Your move does not solve the check\n");
+      undo_move(board, &move);
+      return;
+    }
+  } else {
+    bool self_check;
+    if (board->player == White) {
+      self_check = get_check_status(board, &board->whiteKing);
+    } else {
+      self_check = get_check_status(board, &board->blackKing);
+    }
+    if (self_check) {
+      fprintf(stderr, "Illegal move. You cause check to yourself\n");
       undo_move(board, &move);
       return;
     }
