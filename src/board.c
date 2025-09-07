@@ -211,7 +211,7 @@ Board *new_board(char *fen) {
     board->check_move = get_check_status(board, &board->whiteKing);
   } else if (blackKingPresent && board->player == Black) {
     board->check_move = get_check_status(board, &board->blackKing);
-  }else{
+  } else {
     board->check_move = false;
   }
 
@@ -260,16 +260,16 @@ void print_board(Board *board) {
 
 void print_board_info(Board *board) {
   printf("%-10s - '%s'\n", "castling", board->castling);
-  printf("%-10s - %b\n", "check_move", board->check_move);
-  printf("%-10s - %b\n", "checkmate", board->checkmate);
+  printf("%-10s - %s\n", "check move", board->check_move ? "True" : "False");
+  printf("%-10s - %s\n", "checkmate", board->checkmate ? "True" : "False");
   printf("%-10s - %d\n", "fullmoves", board->fullmoves);
   printf("%-10s - %d\n", "halfmoves", board->halfmoves);
   printf("%-10s - %d %d\n", "enpassant", board->enpassant.row,
          board->enpassant.col);
   if (board->player == White) {
-    printf("%-10s - 'White'\n", "player");
+    printf("%-10s - White\n", "player");
   } else {
-    printf("%-10s - 'Black'\n", "player");
+    printf("%-10s - Black\n", "player");
   }
 }
 
