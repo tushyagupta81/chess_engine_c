@@ -13,5 +13,6 @@ int main() {
   RUN_TEST(test_moves_notation);
   RUN_TEST(test_enpassent);
   RUN_TEST(test_check);
+  RUN_TEST(test_checkmate);
   return UNITY_END();
 }

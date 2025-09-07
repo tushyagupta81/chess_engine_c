@@ -69,7 +69,7 @@ void get_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
         ADD_MOVES(i - 1, j + col);
       }
     }
-    if (i == 6) {
+    if (i == 6 && get_piece_color(board, i - 2, j) == None) {
       ADD_MOVES(i - 2, j);
     }
     break;
@@ -86,7 +86,7 @@ void get_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
         ADD_MOVES(i + 1, j + col);
       }
     }
-    if (i == 1) {
+    if (i == 1 && get_piece_color(board, i + 2, j) == None) {
       ADD_MOVES(i + 2, j);
     }
     break;

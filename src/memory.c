@@ -1,5 +1,6 @@
 #include "memory.h"
 #include "board.h"
+#include "moves.h"
 #include "pieces.h"
 #include "types.h"
 #include <stdint.h>
@@ -30,6 +31,9 @@ Array *new_array(ValueTypes type) {
     break;
   case ValuePosition:
     array->elem_size = sizeof(Position);
+    break;
+  case ValueMoves:
+    array->elem_size = sizeof(Move);
     break;
   default:
     fprintf(stderr, "Unknow type");

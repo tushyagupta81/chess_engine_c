@@ -1,6 +1,7 @@
 #include "board.h"
 #include "icons.h"
 #include "memory.h"
+#include "moves.h"
 #include "pieces.h"
 #include "types.h"
 #include <stdbool.h>
@@ -210,6 +211,14 @@ Board *new_board(char *fen) {
     board->check_move = get_check_status(board, &board->whiteKing);
   } else if (blackKingPresent && board->player == Black) {
     board->check_move = get_check_status(board, &board->blackKing);
+  }else{
+    board->check_move = false;
+  }
+
+  if (board->check_move) {
+    board->checkmate = checkmate(board);
+  } else {
+    board->checkmate = false;
   }
 
   return board;
@@ -252,6 +261,7 @@ void print_board(Board *board) {
 void print_board_info(Board *board) {
   printf("%-10s - '%s'\n", "castling", board->castling);
   printf("%-10s - %b\n", "check_move", board->check_move);
+  printf("%-10s - %b\n", "checkmate", board->checkmate);
   printf("%-10s - %d\n", "fullmoves", board->fullmoves);
   printf("%-10s - %d\n", "halfmoves", board->halfmoves);
   printf("%-10s - %d %d\n", "enpassant", board->enpassant.row,

@@ -27,6 +27,7 @@ typedef struct {
   Enpassent enpassant;
   uint16_t halfmoves;
   uint16_t fullmoves;
+  bool checkmate;
 } Board;
 
 #define INBOUNDS(r, c) ((r) < 8 && (c) < 8)

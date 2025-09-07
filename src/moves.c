@@ -14,6 +14,87 @@ void print_move(Move *move) {
   printf("End:   %d, %d\n", move->end.row, move->end.col);
 }
 
+void pseudo_do_move(Board *board, Move *move) {
+  set_at_2d(board->board, (Pieces[]){move->start_piece}, move->end.row,
+            move->end.col);
+  set_at_2d(board->board, (Pieces[]){Blank}, move->start.row, move->start.col);
+  if (move->start_piece == WhiteKing) {
+    board->whiteKing.row = move->end.row;
+    board->whiteKing.col = move->end.col;
+  } else if (move->start_piece == BlackKing) {
+    board->blackKing.row = move->end.row;
+    board->blackKing.col = move->end.col;
+  }
+}
+
+void undo_move(Board *board, Move *move) {
+  if (move->start_piece == WhiteKing) {
+    board->whiteKing.row = move->start.row;
+    board->whiteKing.col = move->start.col;
+  } else if (move->start_piece == BlackKing) {
+    board->blackKing.row = move->start.row;
+    board->blackKing.col = move->start.col;
+  }
+  set_at_2d(board->board, &move->end_piece, move->end.row, move->end.col);
+  set_at_2d(board->board, &move->start_piece, move->start.row, move->start.col);
+}
+
+bool checkmate(Board *board) {
+  Array *positions = new_array(ValuePosition);
+  Array *moves = new_array(ValueMoves);
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
+      if (board->player == Black) {
+        if (get_piece_color(board, i, j) == Black) {
+          get_moves(positions, board, i, j);
+        }
+      } else {
+        if (get_piece_color(board, i, j) == White) {
+          get_moves(positions, board, i, j);
+        }
+      }
+      for (int k = 0; k < positions->curr_length; k++) {
+        Position p = *(Position *)get_at(positions, k);
+        append(moves, (Move[]){{
+                          (Position){i, j},
+                          GET_PIECE(i, j),
+                          p,
+                          GET_PIECE(p.row, p.col),
+                      }});
+      }
+      while (positions->curr_length != 0) {
+        pop(positions);
+      }
+    }
+  }
+  for (int i = 0; i < moves->curr_length; i++) {
+    Move m = *(Move *)get_at(moves, i);
+    pseudo_do_move(board, &m);
+    if (board->player == Black) {
+      if (get_check_status(board, &board->blackKing) == true) {
+        undo_move(board, &m);
+      } else {
+        undo_move(board, &m);
+        deinit_array(moves);
+        deinit_array(positions);
+        return false;
+      }
+    } else {
+      if (get_check_status(board, &board->whiteKing) == true) {
+        undo_move(board, &m);
+      } else {
+        undo_move(board, &m);
+        deinit_array(moves);
+        deinit_array(positions);
+        return false;
+      }
+    }
+  }
+  deinit_array(moves);
+  deinit_array(positions);
+  return true;
+}
+
 bool check_bounds(Move *move) {
   if (move->start.row < 8 && move->start.col < 8 && move->end.row < 8 &&
       move->end.col < 8) {
@@ -144,16 +225,7 @@ void do_move(Board *board, char *move_string) {
     }
     if (now_check == true) {
       fprintf(stderr, "Your move does not solve the check\n");
-      if (move.start_piece == WhiteKing) {
-        board->whiteKing.row = move.start.row;
-        board->whiteKing.col = move.start.col;
-      } else if (move.start_piece == BlackKing) {
-        board->blackKing.row = move.start.row;
-        board->blackKing.col = move.start.col;
-      }
-      set_at_2d(board->board, &move.end_piece, move.end.row, move.end.col);
-      set_at_2d(board->board, &move.start_piece, move.start.row,
-                move.start.col);
+      undo_move(board, &move);
       return;
     }
   }
@@ -195,9 +267,9 @@ void do_move(Board *board, char *move_string) {
     board->halfmoves++;
   }
 
-  if(board->player == White){
+  if (board->player == White) {
     board->check_move = get_check_status(board, &board->blackKing);
-  }else if(board->player == Black){
+  } else if (board->player == Black) {
     board->check_move = get_check_status(board, &board->whiteKing);
   }
 
@@ -206,5 +278,9 @@ void do_move(Board *board, char *move_string) {
   } else {
     board->player = White;
     board->fullmoves++;
+  }
+
+  if (board->check_move == true) {
+    board->checkmate = checkmate(board);
   }
 }
