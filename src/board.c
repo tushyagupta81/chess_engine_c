@@ -5,9 +5,56 @@
 #include "pieces.h"
 #include "types.h"
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+int get_piece_value(Pieces piece, uint16_t i, uint16_t j) {
+  // TODO: change these according to the mapping to good positions for them
+  (void)i;
+  (void)j;
+  switch (piece) {
+  case Blank:
+    return 0;
+  case WhitePawn:
+    return 1;
+  case WhiteRook:
+    return 5;
+  case WhiteBishop:
+    return 3;
+  case WhiteKnight:
+    return 3;
+  case WhiteQueen:
+    return 9;
+  case WhiteKing:
+    return 10;
+  case BlackPawn:
+    return 1;
+  case BlackRook:
+    return 5;
+  case BlackBishop:
+    return 3;
+  case BlackKnight:
+    return 3;
+  case BlackQueen:
+    return 9;
+  case BlackKing:
+    return 10;
+  }
+}
+
+int get_board_score(Board *board, Player color) {
+  int res = 0;
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
+      if (get_piece_color(board, i, j) == color) {
+        res += get_piece_value(GET_PIECE(i, j), i, j);
+      }
+    }
+  }
+  return res;
+}
 
 bool get_check_status(Board *board, Position *king) {
   Array *moves = new_array(ValuePosition);

@@ -9,5 +9,6 @@ void test_moves_notation();
 void test_enpassent();
 void test_check();
 void test_checkmate();
+void test_alpha_beta();
 
 #endif // !TESTS_H

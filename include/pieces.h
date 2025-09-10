@@ -25,4 +25,6 @@ typedef enum {
   OutOfBounds,
 } Player;
 
+Player get_opponent(Player player);
+
 #endif // !PIECES_H

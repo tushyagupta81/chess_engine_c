@@ -273,3 +273,13 @@ void get_check_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
     break;
   }
 }
+
+Player get_opponent(Player player) {
+  if (player == White) {
+    return Black;
+  } else if (player == Black) {
+    return White;
+  } else {
+    return None;
+  }
+}

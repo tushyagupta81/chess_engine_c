@@ -147,6 +147,20 @@ bool decode_move(char *move_string, Move *move) {
   return true;
 }
 
+void encode_move(Move *move, char *move_string) {
+  move_string[0] = 7 + 'a' - move->start.row;
+  move_string[1] = '1' + move->start.col;
+  move_string[2] = 7 + 'a' - move->end.row;
+  move_string[3] = '1' + move->end.col;
+  move_string[4] = '\0';
+}
+
+void do_encoded_move(Board *board, Move *move) {
+  char *move_string = malloc(sizeof(char) * 5);
+  encode_move(move, move_string);
+  do_move(board, move_string);
+}
+
 Player get_piece_color(Board *board, uint16_t i, uint16_t j) {
   if (!INBOUNDS(i, j)) {
     return OutOfBounds;

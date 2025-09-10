@@ -41,5 +41,6 @@ bool get_check_status(Board *board, Position *king);
 void print_board(Board *board);
 void print_board_info(Board *board);
 bool cmp_pos(Position *a, Position *b);
+int get_board_score(Board *board, Player color);
 
 #endif // !BOARD_H

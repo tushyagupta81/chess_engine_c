@@ -14,5 +14,6 @@ int main() {
   RUN_TEST(test_enpassent);
   RUN_TEST(test_check);
   RUN_TEST(test_checkmate);
+  RUN_TEST(test_alpha_beta);
   return UNITY_END();
 }
