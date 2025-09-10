@@ -50,6 +50,7 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
   int i;
   if (maximizingPlayer) {
     int best = INT_MIN;
+    int best_index = 0;
 
     for (i = 0; i < moves->curr_length; i++) {
       Move *m = (Move *)get_at(moves, i);
@@ -71,22 +72,23 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
 
       board->player = player;
       undo_move(board, m);
-      best = max(best, v);
+      if (v > best) {
+        best = v;
+        best_index = i;
+      }
       alpha = max(alpha, v);
       if (alpha >= beta) {
         break;
       }
     }
     if (depth == 0) {
-      if (i == moves->curr_length) {
-        i--;
-      }
-      memcpy(move_todo, get_at(moves, i), sizeof(Move));
+      memcpy(move_todo, get_at(moves, best_index), sizeof(Move));
     }
     deinit_array(moves);
     return best;
   } else {
     int best = INT_MAX;
+    int best_index = 0;
     for (i = 0; i < moves->curr_length; i++) {
       Move *m = (Move *)get_at(moves, i);
       pseudo_do_move(board, m);
@@ -104,20 +106,20 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
       board->player = get_opponent(player);
       int v = alpha_beta(board, true, get_opponent(player), alpha, beta,
                          depth + 1, move_todo);
-      board->player = get_opponent(player);
+      board->player = player;
 
       undo_move(board, m);
-      best = min(best, v);
+      if (v < best) {
+        best = v;
+        best_index = i;
+      }
       beta = min(beta, v);
       if (alpha >= beta) {
         break;
       }
     }
     if (depth == 0) {
-      if (i == moves->curr_length) {
-        i--;
-      }
-      memcpy(move_todo, get_at(moves, i), sizeof(Move));
+      memcpy(move_todo, get_at(moves, best_index), sizeof(Move));
     }
     deinit_array(moves);
     return best;

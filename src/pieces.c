@@ -269,7 +269,8 @@ void get_check_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
     break;
   }
   default:
-    fprintf(stderr, "Can only generate check_moves for king\n");
+    fprintf(stderr, "Can only generate check_moves for king - %d '%d %d'\n",
+            piece, i, j);
     break;
   }
 }

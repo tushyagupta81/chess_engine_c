@@ -1,7 +1,10 @@
 #include "board.h"
 #include "memory.h"
+#include "move_gen.h"
 #include "moves.h"
+#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int main() {
@@ -11,6 +14,7 @@ int main() {
   print_board(board);
   print_board_info(board);
   char input[5 + 1];
+  Move *move = malloc(sizeof(Move));
   while (1) {
     printf("> ");
     fflush(stdout);
@@ -41,6 +45,11 @@ int main() {
       }
       break;
     }
+    alpha_beta(board, true, board->player, INT_MIN,
+               INT_MAX, 0, move);
+    do_encoded_move(board, move);
+    print_board(board);
+    print_board_info(board);
   }
   deinit_board(board);
   return 0;

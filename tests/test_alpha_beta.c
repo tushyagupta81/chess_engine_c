@@ -16,6 +16,7 @@ void test_alpha_beta(void) {
                INT_MAX, 0, move);
     do_encoded_move(board, move);
   }
+  free(move);
   print_board(board);
   deinit_board(board);
 }

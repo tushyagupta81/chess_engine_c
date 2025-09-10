@@ -42,6 +42,7 @@ int get_piece_value(Pieces piece, uint16_t i, uint16_t j) {
   case BlackKing:
     return 10;
   }
+  return 0;
 }
 
 int get_board_score(Board *board, Player color) {
