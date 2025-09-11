@@ -49,120 +49,73 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
   }
   deinit_array(positions);
 
-  int i;
+  int best;
   if (maximizingPlayer) {
-    int best = INT_MIN;
-    int best_index = 0;
+    best = INT_MIN;
+  } else {
+    best = INT_MAX;
+  }
 
-    for (i = 0; i < moves->curr_length; i++) {
-      Move *m = (Move *)get_at(moves, i);
-      pseudo_do_move(board, m);
+  int best_index = 0;
 
-      if (check_check(board, false)) {
-        undo_move(board, m);
-        continue;
-      }
+  for (int i = 0; i < moves->curr_length; i++) {
+    Move *m = (Move *)get_at(moves, i);
+    pseudo_do_move(board, m);
 
-      bool old_check_status = board->check_move;
-      bool old_checkmate_status = board->checkmate;
-
-      if (board->player == White) {
-        board->check_move = get_check_status(board, &board->blackKing);
-      } else if (board->player == Black) {
-        board->check_move = get_check_status(board, &board->whiteKing);
-      }
-
-      board->player = get_opponent(player);
-
-      if (board->check_move == true) {
-        board->checkmate = checkmate(board);
-      }
-
-      if (board->checkmate) {
-        board->player = player;
-        board->check_move = old_check_status;
-        board->checkmate = old_checkmate_status;
-        undo_move(board, m);
-        return INT_MAX;
-      }
-
-      int v = alpha_beta(board, false, get_opponent(player), alpha, beta,
-                         depth + 1, move_todo);
-
-      board->player = player;
-      board->check_move = old_check_status;
-      board->checkmate = old_checkmate_status;
+    if (check_check(board, false)) {
       undo_move(board, m);
+      continue;
+    }
+
+    bool old_check_status = board->check_move;
+    bool old_checkmate_status = board->checkmate;
+
+    if (board->player == White) {
+      board->check_move = get_check_status(board, &board->blackKing);
+    } else if (board->player == Black) {
+      board->check_move = get_check_status(board, &board->whiteKing);
+    }
+
+    board->player = get_opponent(player);
+
+    if (board->check_move == true) {
+      board->checkmate = checkmate(board);
+    }
+
+    int v = 0;
+    if (board->checkmate) {
+      v = maximizingPlayer ? INT_MAX : INT_MIN;
+    } else {
+      v = alpha_beta(board, !maximizingPlayer, get_opponent(player), alpha,
+                     beta, depth + 1, move_todo);
+    }
+
+    board->player = player;
+    board->check_move = old_check_status;
+    board->checkmate = old_checkmate_status;
+    undo_move(board, m);
+    if (maximizingPlayer) {
       if (v > best) {
         best = v;
         best_index = i;
       }
       alpha = max(alpha, v);
-      if (alpha >= beta) {
-        break;
-      }
-    }
-    if (depth == 0) {
-      memcpy(move_todo, get_at(moves, best_index), sizeof(Move));
-    }
-    deinit_array(moves);
-    return best;
-  } else {
-    int best = INT_MAX;
-    int best_index = 0;
-    for (i = 0; i < moves->curr_length; i++) {
-      Move *m = (Move *)get_at(moves, i);
-      pseudo_do_move(board, m);
-
-      if (check_check(board, false)) {
-        undo_move(board, m);
-        continue;
-      }
-
-      bool old_check_status = board->check_move;
-      bool old_checkmate_status = board->checkmate;
-
-      if (board->player == White) {
-        board->check_move = get_check_status(board, &board->blackKing);
-      } else if (board->player == Black) {
-        board->check_move = get_check_status(board, &board->whiteKing);
-      }
-
-      board->player = get_opponent(player);
-
-      if (board->check_move == true) {
-        board->checkmate = checkmate(board);
-      }
-
-      if (board->checkmate) {
-        board->player = player;
-        board->check_move = old_check_status;
-        board->checkmate = old_checkmate_status;
-        undo_move(board, m);
-        return INT_MIN;
-      }
-
-      int v = alpha_beta(board, true, get_opponent(player), alpha, beta,
-                         depth + 1, move_todo);
-
-      board->player = player;
-      board->check_move = old_check_status;
-      board->checkmate = old_checkmate_status;
-
-      undo_move(board, m);
+    } else {
       if (v < best) {
         best = v;
         best_index = i;
       }
       beta = min(beta, v);
-      if (alpha >= beta) {
-        break;
-      }
     }
-    if (depth == 0) {
-      memcpy(move_todo, get_at(moves, best_index), sizeof(Move));
+    if (alpha >= beta) {
+      break;
     }
-    deinit_array(moves);
-    return best;
   }
+
+  if (depth == 0) {
+    memcpy(move_todo, get_at(moves, best_index), sizeof(Move));
+  }
+
+  deinit_array(moves);
+  return best;
 }
