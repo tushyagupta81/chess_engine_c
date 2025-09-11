@@ -175,6 +175,37 @@ Player get_piece_color(Board *board, uint16_t i, uint16_t j) {
   return Black;
 }
 
+bool check_check(Board*board, bool printErr){
+  if (board->check_move == true) {
+    bool now_check;
+    if (board->player == White) {
+      now_check = get_check_status(board, &board->whiteKing);
+    } else {
+      now_check = get_check_status(board, &board->blackKing);
+    }
+    if (now_check == true) {
+      if (printErr) {
+        fprintf(stderr, "Your move does not solve the check\n");
+      }
+      return true;
+    }
+  } else {
+    bool self_check;
+    if (board->player == White) {
+      self_check = get_check_status(board, &board->whiteKing);
+    } else {
+      self_check = get_check_status(board, &board->blackKing);
+    }
+    if (self_check) {
+      if (printErr) {
+        fprintf(stderr, "Illegal move. You cause check to yourself\n");
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
 void do_move(Board *board, char *move_string) {
   Move move;
   bool valid = decode_move(move_string, &move);
@@ -225,41 +256,11 @@ void do_move(Board *board, char *move_string) {
     return;
   }
 
-  set_at_2d(board->board, (Pieces[]){move.start_piece}, move.end.row,
-            move.end.col);
-  set_at_2d(board->board, (Pieces[]){Blank}, move.start.row, move.start.col);
-  if (move.start_piece == WhiteKing) {
-    board->whiteKing.row = move.end.row;
-    board->whiteKing.col = move.end.col;
-  } else if (move.start_piece == BlackKing) {
-    board->blackKing.row = move.end.row;
-    board->blackKing.col = move.end.col;
-  }
+  pseudo_do_move(board, &move);
 
-  if (board->check_move == true) {
-    bool now_check;
-    if (board->player == White) {
-      now_check = get_check_status(board, &board->whiteKing);
-    } else {
-      now_check = get_check_status(board, &board->blackKing);
-    }
-    if (now_check == true) {
-      fprintf(stderr, "Your move does not solve the check\n");
-      undo_move(board, &move);
-      return;
-    }
-  } else {
-    bool self_check;
-    if (board->player == White) {
-      self_check = get_check_status(board, &board->whiteKing);
-    } else {
-      self_check = get_check_status(board, &board->blackKing);
-    }
-    if (self_check) {
-      fprintf(stderr, "Illegal move. You cause check to yourself\n");
-      undo_move(board, &move);
-      return;
-    }
+  if(check_check(board, true)){
+    undo_move(board, &move);
+    return;
   }
 
   if ((move.start_piece == WhitePawn || move.start_piece == BlackPawn) &&

@@ -61,9 +61,10 @@ bool get_check_status(Board *board, Position *king) {
   Array *moves = new_array(ValuePosition);
   get_check_moves(moves, board, king->row, king->col);
 
+  Array *piece_moves = new_array(ValuePosition);
   for (int i = 0; i < moves->curr_length; i++) {
     Position *pos = get_at(moves, i);
-    Array *piece_moves = new_array(ValuePosition);
+    piece_moves->curr_length = 0;
     get_moves(piece_moves, board, pos->row, pos->col);
     for (int j = 0; j < piece_moves->curr_length; j++) {
       if (cmp_pos(king, get_at(piece_moves, j))) {
@@ -73,8 +74,8 @@ bool get_check_status(Board *board, Position *king) {
         return true;
       }
     }
-    deinit_array(piece_moves);
   }
+  deinit_array(piece_moves);
   deinit_array(moves);
   return false;
 }

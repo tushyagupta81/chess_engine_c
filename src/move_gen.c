@@ -14,6 +14,7 @@ int max(int a, int b) {
   }
   return b;
 }
+
 int min(int a, int b) {
   if (a < b) {
     return a;
@@ -28,9 +29,10 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
   }
 
   Array *moves = new_array(ValueMoves);
+  Array *positions = new_array(ValuePosition);
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
-      Array *positions = new_array(ValuePosition);
+      positions->curr_length = 0;
       if (get_piece_color(board, i, j) == player) {
         get_moves(positions, board, i, j);
       }
@@ -43,9 +45,9 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
                           GET_PIECE(p.row, p.col),
                       }});
       }
-      deinit_array(positions);
     }
   }
+  deinit_array(positions);
 
   int i;
   if (maximizingPlayer) {
@@ -55,22 +57,41 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
     for (i = 0; i < moves->curr_length; i++) {
       Move *m = (Move *)get_at(moves, i);
       pseudo_do_move(board, m);
-      bool self_check;
-      if (board->player == White) {
-        self_check = get_check_status(board, &board->whiteKing);
-      } else {
-        self_check = get_check_status(board, &board->blackKing);
-      }
-      if (self_check) {
+
+      if (check_check(board, false)) {
         undo_move(board, m);
         continue;
       }
+
+      bool old_check_status = board->check_move;
+      bool old_checkmate_status = board->checkmate;
+
+      if (board->player == White) {
+        board->check_move = get_check_status(board, &board->blackKing);
+      } else if (board->player == Black) {
+        board->check_move = get_check_status(board, &board->whiteKing);
+      }
+
       board->player = get_opponent(player);
+
+      if (board->check_move == true) {
+        board->checkmate = checkmate(board);
+      }
+
+      if (board->checkmate) {
+        board->player = player;
+        board->check_move = old_check_status;
+        board->checkmate = old_checkmate_status;
+        undo_move(board, m);
+        return 1e5;
+      }
 
       int v = alpha_beta(board, false, get_opponent(player), alpha, beta,
                          depth + 1, move_todo);
 
       board->player = player;
+      board->check_move = old_check_status;
+      board->checkmate = old_checkmate_status;
       undo_move(board, m);
       if (v > best) {
         best = v;
@@ -92,21 +113,41 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
     for (i = 0; i < moves->curr_length; i++) {
       Move *m = (Move *)get_at(moves, i);
       pseudo_do_move(board, m);
-      bool self_check;
-      if (board->player == White) {
-        self_check = get_check_status(board, &board->whiteKing);
-      } else {
-        self_check = get_check_status(board, &board->blackKing);
-      }
-      if (self_check) {
+
+      if (check_check(board, false)) {
         undo_move(board, m);
         continue;
       }
 
+      bool old_check_status = board->check_move;
+      bool old_checkmate_status = board->checkmate;
+
+      if (board->player == White) {
+        board->check_move = get_check_status(board, &board->blackKing);
+      } else if (board->player == Black) {
+        board->check_move = get_check_status(board, &board->whiteKing);
+      }
+
       board->player = get_opponent(player);
+
+      if (board->check_move == true) {
+        board->checkmate = checkmate(board);
+      }
+
+      if (board->checkmate) {
+        board->player = player;
+        board->check_move = old_check_status;
+        board->checkmate = old_checkmate_status;
+        undo_move(board, m);
+        return 0;
+      }
+
       int v = alpha_beta(board, true, get_opponent(player), alpha, beta,
                          depth + 1, move_todo);
+
       board->player = player;
+      board->check_move = old_check_status;
+      board->checkmate = old_checkmate_status;
 
       undo_move(board, m);
       if (v < best) {

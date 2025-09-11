@@ -18,5 +18,6 @@ void pseudo_do_move(Board *board, Move *move);
 void undo_move(Board *board, Move *move);
 void print_move(Move *move);
 void do_encoded_move(Board *board, Move *move);
+bool check_check(Board*board, bool printErr);
 
 #endif // !MOVES_H
