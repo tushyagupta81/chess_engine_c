@@ -83,7 +83,7 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
         board->check_move = old_check_status;
         board->checkmate = old_checkmate_status;
         undo_move(board, m);
-        return 1e5;
+        return INT_MAX;
       }
 
       int v = alpha_beta(board, false, get_opponent(player), alpha, beta,
@@ -139,7 +139,7 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
         board->check_move = old_check_status;
         board->checkmate = old_checkmate_status;
         undo_move(board, m);
-        return 0;
+        return INT_MIN;
       }
 
       int v = alpha_beta(board, true, get_opponent(player), alpha, beta,

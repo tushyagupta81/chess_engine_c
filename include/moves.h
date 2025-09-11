@@ -11,7 +11,7 @@ typedef struct {
   Pieces end_piece;
 } Move;
 
-void do_move(Board *board, char *move_string);
+bool do_move(Board *board, char *move_string);
 Player get_piece_color(Board *board, uint16_t i, uint16_t j);
 bool checkmate(Board *board);
 void pseudo_do_move(Board *board, Move *move);

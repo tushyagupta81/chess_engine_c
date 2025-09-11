@@ -2,6 +2,7 @@
 #include "icons.h"
 #include "memory.h"
 #include "moves.h"
+#include "piece_square.h"
 #include "pieces.h"
 #include "types.h"
 #include <stdbool.h>
@@ -11,36 +12,36 @@
 #include <string.h>
 
 int get_piece_value(Pieces piece, uint16_t i, uint16_t j) {
-  // TODO: change these according to the mapping to good positions for them
-  (void)i;
-  (void)j;
+  // TODO: see https://www.chessprogramming.org/PeSTO%27s_Evaluation_Function
+  int white_index = i*8+j;
+  int black_index = 64 - (i*8+j+1);
   switch (piece) {
   case Blank:
     return 0;
   case WhitePawn:
-    return 1;
+    return 100 + pawn_piece_sqaure[white_index];
   case WhiteRook:
-    return 5;
+    return 500 + rook_piece_sqaure[white_index];
   case WhiteBishop:
-    return 3;
+    return 330 + bishop_piece_sqaure[white_index];
   case WhiteKnight:
-    return 3;
+    return 320 + knight_piece_sqaure[white_index];
   case WhiteQueen:
-    return 9;
+    return 900 + queen_piece_sqaure[white_index];
   case WhiteKing:
-    return 10;
+    return 20000 + king_piece_sqaure[white_index];
   case BlackPawn:
-    return 1;
+    return 100 + pawn_piece_sqaure[black_index];
   case BlackRook:
-    return 5;
+    return 500 + rook_piece_sqaure[black_index];
   case BlackBishop:
-    return 3;
+    return 330 + bishop_piece_sqaure[black_index];
   case BlackKnight:
-    return 3;
+    return 320 + knight_piece_sqaure[black_index];
   case BlackQueen:
-    return 9;
+    return 900 + queen_piece_sqaure[black_index];
   case BlackKing:
-    return 10;
+    return 20000 + king_piece_sqaure[black_index];
   }
   return 0;
 }

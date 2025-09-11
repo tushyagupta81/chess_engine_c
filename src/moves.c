@@ -206,32 +206,32 @@ bool check_check(Board*board, bool printErr){
   return false;
 }
 
-void do_move(Board *board, char *move_string) {
+bool do_move(Board *board, char *move_string) {
   Move move;
   bool valid = decode_move(move_string, &move);
   if (!valid) {
     fprintf(stderr, "Invalid move: '%s'\n", move_string);
-    return;
+    return false;
   }
 
   Player start_color = get_piece_color(board, move.start.row, move.start.col);
   if (start_color == None) {
     fprintf(stderr, "Please choose a piece to move\n");
     fprintf(stderr, "Invalid move: '%s'\n", move_string);
-    return;
+    return false;
   }
 
   if (start_color != board->player) {
     fprintf(stderr, "You can only use your own pieces\n");
     fprintf(stderr, "Invalid move: '%s'\n", move_string);
-    return;
+    return false;
   }
 
   Player end_color = get_piece_color(board, move.end.row, move.end.col);
   if (start_color == end_color) {
     fprintf(stderr, "Same colors cannot attack each other\n");
     fprintf(stderr, "Invalid move: '%s'\n", move_string);
-    return;
+    return false;
   }
 
   // print_move(&move);
@@ -253,14 +253,14 @@ void do_move(Board *board, char *move_string) {
   if (!found_move) {
     fprintf(stderr, "Move not possible\n");
     fprintf(stderr, "Invalid move: '%s'\n", move_string);
-    return;
+    return false;
   }
 
   pseudo_do_move(board, &move);
 
   if(check_check(board, true)){
     undo_move(board, &move);
-    return;
+    return false;
   }
 
   if ((move.start_piece == WhitePawn || move.start_piece == BlackPawn) &&
@@ -316,4 +316,6 @@ void do_move(Board *board, char *move_string) {
   if (board->check_move == true) {
     board->checkmate = checkmate(board);
   }
+
+  return true;
 }

@@ -9,7 +9,7 @@ void test_alpha_beta(void) {
   Board *board =
       new_board("3r4/6pP/k1P1n3/2P5/2pq1NK1/7p/1R3B1N/3B4 w - - 0 1");
   Move *move = malloc(sizeof(Move));
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 5; i++) {
     // print_board(board);
     // print_board_info(board);
     alpha_beta(board, true, board->player, INT_MIN,

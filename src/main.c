@@ -10,7 +10,7 @@
 int main() {
   Board *board =
       new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
-      // new_board("6k1/5ppp/8/8/8/8/8/R6K w KQkq - 0 15");
+  // new_board("6k1/5ppp/8/8/8/8/8/R6K w KQkq - 0 15");
   print_board(board);
   print_board_info(board);
   char input[5 + 1];
@@ -33,7 +33,9 @@ int main() {
     }
 
     printf("\n");
-    do_move(board, input);
+    if (!do_move(board, input)) {
+      continue;
+    }
     print_board(board);
     print_board_info(board);
     if (board->checkmate == true) {
@@ -45,8 +47,7 @@ int main() {
       }
       break;
     }
-    alpha_beta(board, true, board->player, INT_MIN,
-               INT_MAX, 0, move);
+    alpha_beta(board, true, board->player, INT_MIN, INT_MAX, 0, move);
     do_encoded_move(board, move);
     print_board(board);
     print_board_info(board);
