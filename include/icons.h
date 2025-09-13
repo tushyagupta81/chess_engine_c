@@ -1,5 +1,8 @@
+#ifndef ICONS_H
+#define ICONS_H
+
 const char *icons[] = {
-    " ",    // Empty
+    " ", // Empty
     "\x1b[37m󰡙",
     "\x1b[37m",
     "\x1b[37m",
@@ -13,3 +16,5 @@ const char *icons[] = {
     "\x1b[30m",
     "\x1b[30m",
 };
+
+#endif // !ICONS_H

@@ -1,6 +1,7 @@
 #include "move_gen.h"
 #include "board.h"
 #include "memory.h"
+#include "eval.h"
 #include "moves.h"
 #include "pieces.h"
 #include "types.h"
