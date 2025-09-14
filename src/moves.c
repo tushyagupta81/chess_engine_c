@@ -127,15 +127,15 @@ bool decode_move(char *move_string, Move *move) {
     return false;
   }
 
-  char start_row = move_string[0];
-  char start_col = move_string[1];
-  char end_row = move_string[2];
-  char end_col = move_string[3];
+  char start_col = move_string[0];
+  char start_row = move_string[1];
+  char end_col = move_string[2];
+  char end_row = move_string[3];
 
-  move->start.row = 7 - (start_row - 'a');
-  move->start.col = start_col - '1';
-  move->end.row = 7 - (end_row - 'a');
-  move->end.col = end_col - '1';
+  move->start.row = 7 - (start_row - '1');
+  move->start.col = start_col - 'a';
+  move->end.row = 7 - (end_row - '1');
+  move->end.col = end_col - 'a';
 
   bool bounds = check_bounds(move);
   if (!bounds) {
@@ -148,10 +148,10 @@ bool decode_move(char *move_string, Move *move) {
 }
 
 void encode_move(Move *move, char *move_string) {
-  move_string[0] = 7 + 'a' - move->start.row;
-  move_string[1] = '1' + move->start.col;
-  move_string[2] = 7 + 'a' - move->end.row;
-  move_string[3] = '1' + move->end.col;
+  move_string[0] = 'a' + move->start.col;
+  move_string[1] = 7 + '1' - move->start.row;
+  move_string[2] = 'a' + move->end.col;
+  move_string[3] = 7 + '1' - move->end.row;
   move_string[4] = '\0';
 }
 
@@ -175,7 +175,7 @@ Player get_piece_color(Board *board, uint16_t i, uint16_t j) {
   return Black;
 }
 
-bool check_check(Board*board, bool printErr){
+bool check_check(Board *board, bool printErr) {
   if (board->check_move == true) {
     bool now_check;
     if (board->player == White) {
@@ -258,7 +258,7 @@ bool do_move(Board *board, char *move_string) {
 
   pseudo_do_move(board, &move);
 
-  if(check_check(board, true)){
+  if (check_check(board, true)) {
     undo_move(board, &move);
     return false;
   }

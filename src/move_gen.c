@@ -1,12 +1,14 @@
 #include "move_gen.h"
 #include "board.h"
-#include "memory.h"
 #include "eval.h"
+#include "memory.h"
 #include "moves.h"
 #include "pieces.h"
 #include "types.h"
 #include <limits.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 int max(int a, int b) {
@@ -25,6 +27,10 @@ int min(int a, int b) {
 
 int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
                int beta, int depth, Move *move_todo) {
+  if (board->halfmoves > 100) {
+    return 0;
+  }
+
   if (depth >= MAX_DEPTH) {
     return get_board_score(board, player);
   }
@@ -50,6 +56,15 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
   }
   deinit_array(positions);
 
+  if (moves->curr_length == 0) {
+    if (check_check(board, false)) {
+      return maximizingPlayer ? INT_MAX - MAX_DEPTH + depth
+                              : INT_MIN + MAX_DEPTH - depth;
+    }
+    // Stalemate
+    return 0;
+  }
+
   int best;
   if (maximizingPlayer) {
     best = INT_MIN;
@@ -69,7 +84,50 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
     }
 
     bool old_check_status = board->check_move;
+    char old_castling[5];
+    strcpy(old_castling, board->castling);
+    Enpassent old_enpassent = board->enpassant;
+    uint16_t old_halfmoves = board->halfmoves;
+    uint16_t old_fullmoves = board->fullmoves;
     bool old_checkmate_status = board->checkmate;
+
+    if ((m->start_piece == WhitePawn || m->start_piece == BlackPawn) &&
+        (board->enpassant.valid)) {
+      if (board->enpassant.row == m->end.row &&
+          board->enpassant.col == m->end.col) {
+        if (m->start_piece == WhitePawn) {
+          set_at_2d(board->board, (Pieces[]){Blank}, m->end.row + 1,
+                    m->end.col);
+        } else {
+          set_at_2d(board->board, (Pieces[]){Blank}, m->end.row - 1,
+                    m->end.col);
+        }
+      }
+    }
+
+    if ((m->start_piece == WhitePawn || m->start_piece == BlackPawn) &&
+        (abs(m->start.row - m->end.row) == 2)) {
+      if (m->end.row < m->start.row) {
+        board->enpassant.row = m->end.row + 1;
+        board->enpassant.col = m->end.col;
+        board->enpassant.valid = true;
+      } else {
+        board->enpassant.row = m->end.row - 1;
+        board->enpassant.col = m->end.col;
+        board->enpassant.valid = true;
+      }
+    } else {
+      board->enpassant.valid = false;
+    }
+
+    if (m->start_piece == WhitePawn || m->start_piece == BlackPawn) {
+      board->halfmoves = 0;
+    } else if (get_piece_color(board, m->end.row, m->end.col) == White ||
+               get_piece_color(board, m->end.row, m->end.col) == Black) {
+      board->halfmoves = 0;
+    } else {
+      board->halfmoves++;
+    }
 
     if (board->player == White) {
       board->check_move = get_check_status(board, &board->blackKing);
@@ -77,7 +135,12 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
       board->check_move = get_check_status(board, &board->whiteKing);
     }
 
-    board->player = get_opponent(player);
+    if (board->player == White) {
+      board->player = Black;
+    } else {
+      board->player = White;
+      board->fullmoves++;
+    }
 
     if (board->check_move == true) {
       board->checkmate = checkmate(board);
@@ -85,7 +148,8 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
 
     int v = 0;
     if (board->checkmate) {
-      v = maximizingPlayer ? INT_MAX : INT_MIN;
+      v = maximizingPlayer ? INT_MAX - MAX_DEPTH + depth
+                           : INT_MIN + MAX_DEPTH - depth;
     } else {
       v = alpha_beta(board, !maximizingPlayer, get_opponent(player), alpha,
                      beta, depth + 1, move_todo);
@@ -93,7 +157,12 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
 
     board->player = player;
     board->check_move = old_check_status;
+    strcpy(board->castling, old_castling);
+    board->enpassant = old_enpassent;
+    board->halfmoves = old_halfmoves;
+    board->fullmoves = old_fullmoves;
     board->checkmate = old_checkmate_status;
+
     undo_move(board, m);
     if (maximizingPlayer) {
       if (v > best) {

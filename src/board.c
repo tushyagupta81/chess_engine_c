@@ -170,8 +170,8 @@ Board *new_board(char *fen) {
   }
   memcpy(enpassent_string, fen + start, l - start);
   if (l - start > 1) {
-    board->enpassant.row = 7 - (enpassent_string[0] - 'a');
-    board->enpassant.col = enpassent_string[1] - '1';
+    board->enpassant.row = 7 - (enpassent_string[1] - '1');
+    board->enpassant.col = enpassent_string[0] - 'a';
     board->enpassant.valid = true;
   } else {
     board->enpassant.row = 0;
@@ -229,12 +229,12 @@ Board *new_board(char *fen) {
 void print_board(Board *board) {
   printf("  ");
   for (int i = 0; i < 8; i++) {
-    printf("%d ", i + 1);
+    printf("%c ", 'A' + i);
   }
   printf("\n");
   for (int i = 0; i < 8; i++) {
     // Array *row = get_at(board->board, i);
-    printf("%c ", 'H' - i);
+    printf("%d ", 8 - i);
     for (int j = 0; j < 8; j++) {
       Pieces piece = *(Pieces *)get_at_2d(board->board, i, j);
 
@@ -250,12 +250,12 @@ void print_board(Board *board) {
       // Reset colors
       printf("\x1b[0m");
     }
-    printf(" %c", 'H' - i);
+    printf(" %d", 8 - i);
     printf("\n");
   }
   printf("  ");
   for (int i = 0; i < 8; i++) {
-    printf("%d ", i + 1);
+    printf("%c ", 'A' + i);
   }
   printf("\n");
 }
@@ -266,8 +266,8 @@ void print_board_info(Board *board) {
   printf("%-10s - %s\n", "checkmate", board->checkmate ? "True" : "False");
   printf("%-10s - %d\n", "fullmoves", board->fullmoves);
   printf("%-10s - %d\n", "halfmoves", board->halfmoves);
-  printf("%-10s - %d %d\n", "enpassant", board->enpassant.row,
-         board->enpassant.col);
+  printf("%-10s - %d %d %s\n", "enpassant", board->enpassant.row,
+         board->enpassant.col, board->enpassant.valid ? "Valid" : "Invalid");
   if (board->player == White) {
     printf("%-10s - White\n", "player");
   } else {
