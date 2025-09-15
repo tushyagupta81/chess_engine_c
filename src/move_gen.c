@@ -32,7 +32,7 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
   }
 
   if (depth >= MAX_DEPTH) {
-    return get_board_score(board, player);
+    return get_board_score(board, get_opponent(player));
   }
 
   Array *moves = new_array(ValueMoves);

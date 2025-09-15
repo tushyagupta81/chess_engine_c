@@ -45,6 +45,7 @@ int main() {
       }
       print_board(board);
       print_board_info(board);
+      printf("\n");
     }
     if (board->checkmate == true) {
       printf("\n=== Game over ===\n");
@@ -55,14 +56,14 @@ int main() {
       }
       break;
     }
-    // uint64_t now = now_ms();
+    uint64_t now = now_ms();
     alpha_beta(board, true, board->player, INT_MIN, INT_MAX, 0, move);
-    // if (auto_move) {
-    //   uint32_t sleep_period = AUTO_MODE_GAP - (now_ms() - now);
-    //   if (sleep_period > 0) {
-    //     sleep_ms(sleep_period);
-    //   }
-    // }
+    if (auto_move) {
+      int sleep_period = AUTO_MODE_GAP - (now_ms() - now);
+      if (sleep_period > 0) {
+        sleep_ms(sleep_period);
+      }
+    }
     do_encoded_move(board, move);
     print_board(board);
     print_board_info(board);

@@ -5,7 +5,7 @@
 #include "moves.h"
 #include "pieces.h"
 
-#define MAX_DEPTH 4
+#define MAX_DEPTH 5
 
 // This is in ms
 #define AUTO_MODE_GAP 1000
