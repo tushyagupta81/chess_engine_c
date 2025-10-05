@@ -15,9 +15,10 @@ void print_move(Move *move) {
 }
 
 void pseudo_do_move(Board *board, Move *move) {
-  set_at_2d(board->board, (Pieces[]){move->start_piece}, move->end.row,
-            move->end.col);
-  set_at_2d(board->board, (Pieces[]){Blank}, move->start.row, move->start.col);
+  set_at(board->board, (Pieces[]){move->start_piece},
+         move->end.row * BOARD_ROW + move->end.col);
+  set_at(board->board, (Pieces[]){Blank},
+         move->start.row * BOARD_ROW + move->start.col);
   if (move->start_piece == WhiteKing) {
     board->whiteKing.row = move->end.row;
     board->whiteKing.col = move->end.col;
@@ -35,8 +36,10 @@ void undo_move(Board *board, Move *move) {
     board->blackKing.row = move->start.row;
     board->blackKing.col = move->start.col;
   }
-  set_at_2d(board->board, &move->end_piece, move->end.row, move->end.col);
-  set_at_2d(board->board, &move->start_piece, move->start.row, move->start.col);
+  set_at(board->board, &move->end_piece,
+         move->end.row * BOARD_ROW + move->end.col);
+  set_at(board->board, &move->start_piece,
+         move->start.row * BOARD_ROW + move->start.col);
 }
 
 bool checkmate(Board *board) {
@@ -268,11 +271,11 @@ bool do_move(Board *board, char *move_string) {
     if (board->enpassant.row == move.end.row &&
         board->enpassant.col == move.end.col) {
       if (move.start_piece == WhitePawn) {
-        set_at_2d(board->board, (Pieces[]){Blank}, move.end.row + 1,
-                  move.end.col);
+        set_at(board->board, (Pieces[]){Blank},
+               move.end.row + 1 * BOARD_ROW + move.end.col);
       } else {
-        set_at_2d(board->board, (Pieces[]){Blank}, move.end.row - 1,
-                  move.end.col);
+        set_at(board->board, (Pieces[]){Blank},
+               move.end.row - 1 * BOARD_ROW + move.end.col);
       }
     }
   }

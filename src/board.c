@@ -34,10 +34,10 @@ bool get_check_status(Board *board, Position *king) {
 }
 
 void deinit_board(Board *board) {
-  for (int i = 0; i < 8; i++) {
-    Array *row = *(Array **)get_at(board->board, i);
-    deinit_array(row); // free row->values
-  }
+  // for (int i = 0; i < 8; i++) {
+  //   Array *row = *(Array **)get_at(board->board, i);
+  //   deinit_array(row); // free row->values
+  // }
   deinit_array(board->board); // free outer array->values
   free(board->castling);
   free(board);
@@ -49,14 +49,17 @@ Board *new_board(char *fen) {
     fprintf(stderr, "Failed to allocated memory to board\n");
     exit(1);
   }
-  board->board = new_array(ValueArray);
-  for (int i = 0; i < 8; i++) {
-    Array *row = new_array(ValuePiece);
-    for (int j = 0; j < 8; j++) {
-      append(row, (Pieces[]){Blank});
-    }
-    append(board->board, &row);
+  board->board = new_array(ValuePiece);
+  for (int i = 0; i < BOARD_ROW * BOARD_COL; i++) {
+    append(board->board, (Pieces[]){Blank});
   }
+  // for (int i = 0; i < 8; i++) {
+  //   Array *row = new_array(ValuePiece);
+  //   for (int j = 0; j < 8; j++) {
+  //     append(row, (Pieces[]){Blank});
+  //   }
+  //   append(board->board, &row);
+  // }
 
   bool whiteKingPresent = false, blackKingPresent = false;
   // Basic board Pieces
@@ -66,50 +69,50 @@ Board *new_board(char *fen) {
   while (fen[l] != ' ' && fen[l] != '\0') {
     switch (fen[l]) {
     case 'P':
-      set_at_2d(board->board, (Pieces[]){WhitePawn}, i, j);
+      set_at(board->board, (Pieces[]){WhitePawn}, i * BOARD_ROW + j);
       break;
     case 'B':
-      set_at_2d(board->board, (Pieces[]){WhiteBishop}, i, j);
+      set_at(board->board, (Pieces[]){WhiteBishop}, i * BOARD_ROW + j);
       break;
     case 'N':
-      set_at_2d(board->board, (Pieces[]){WhiteKnight}, i, j);
+      set_at(board->board, (Pieces[]){WhiteKnight}, i * BOARD_ROW + j);
       break;
     case 'R':
-      set_at_2d(board->board, (Pieces[]){WhiteRook}, i, j);
+      set_at(board->board, (Pieces[]){WhiteRook}, i * BOARD_ROW + j);
       break;
     case 'Q':
-      set_at_2d(board->board, (Pieces[]){WhiteQueen}, i, j);
+      set_at(board->board, (Pieces[]){WhiteQueen}, i * BOARD_ROW + j);
       break;
     case 'K':
       whiteKingPresent = true;
       board->whiteKing.row = i;
       board->whiteKing.col = j;
-      set_at_2d(board->board, (Pieces[]){WhiteKing}, i, j);
+      set_at(board->board, (Pieces[]){WhiteKing}, i * BOARD_ROW + j);
       break;
     case 'p':
-      set_at_2d(board->board, (Pieces[]){BlackPawn}, i, j);
+      set_at(board->board, (Pieces[]){BlackPawn}, i * BOARD_ROW + j);
       break;
     case 'b':
-      set_at_2d(board->board, (Pieces[]){BlackBishop}, i, j);
+      set_at(board->board, (Pieces[]){BlackBishop}, i * BOARD_ROW + j);
       break;
     case 'n':
-      set_at_2d(board->board, (Pieces[]){BlackKnight}, i, j);
+      set_at(board->board, (Pieces[]){BlackKnight}, i * BOARD_ROW + j);
       break;
     case 'r':
-      set_at_2d(board->board, (Pieces[]){BlackRook}, i, j);
+      set_at(board->board, (Pieces[]){BlackRook}, i * BOARD_ROW + j);
       break;
     case 'q':
-      set_at_2d(board->board, (Pieces[]){BlackQueen}, i, j);
+      set_at(board->board, (Pieces[]){BlackQueen}, i * BOARD_ROW + j);
       break;
     case 'k':
       blackKingPresent = true;
       board->blackKing.row = i;
       board->blackKing.col = j;
-      set_at_2d(board->board, (Pieces[]){BlackKing}, i, j);
+      set_at(board->board, (Pieces[]){BlackKing}, i * BOARD_ROW + j);
       break;
     case '1' ... '8':
       for (int k = 0; k < fen[i] - l; k++) {
-        set_at_2d(board->board, (Pieces[]){Blank}, i, j + k);
+        set_at(board->board, (Pieces[]){Blank}, i * BOARD_COL + j + k);
       }
       j += fen[l] - '1';
       break;
@@ -236,7 +239,7 @@ void print_board(Board *board) {
     // Array *row = get_at(board->board, i);
     printf("%d ", 8 - i);
     for (int j = 0; j < 8; j++) {
-      Pieces piece = *(Pieces *)get_at_2d(board->board, i, j);
+      Pieces piece = *(Pieces *)get_at(board->board, i*BOARD_COL + j);
 
       // Choose background (chessboard pattern)
       if ((i + j) % 2 == 0)

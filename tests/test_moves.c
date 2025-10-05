@@ -47,7 +47,7 @@ void test_enpassent(void) {
   TEST_ASSERT_EQUAL(board->enpassant.valid, true);
   do_move(board, "b5c6");
   TEST_ASSERT_EQUAL(board->enpassant.valid, false);
-  TEST_ASSERT_EQUAL(Blank, *(Pieces *)get_at_2d(board->board, 3, 2));
+  TEST_ASSERT_EQUAL(Blank, *(Pieces *)get_at(board->board, 3 * BOARD_COL + 1));
   deinit_board(board);
 }
 

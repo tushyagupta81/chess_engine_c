@@ -6,6 +6,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define BOARD_ROW 8
+#define BOARD_COL 8
+
 typedef struct {
   uint16_t row;
   uint16_t col;
@@ -31,7 +34,7 @@ typedef struct {
 } Board;
 
 #define INBOUNDS(r, c) ((r) < 8 && (c) < 8)
-#define GET_PIECE(r, c) *(Pieces *)get_at_2d(board->board, r, c)
+#define GET_PIECE(r, c) *(Pieces *)get_at(board->board, r *BOARD_ROW + c)
 
 Board *new_board(char *fen);
 void deinit_board(Board *board);

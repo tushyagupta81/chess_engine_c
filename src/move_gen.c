@@ -96,11 +96,11 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
       if (board->enpassant.row == m->end.row &&
           board->enpassant.col == m->end.col) {
         if (m->start_piece == WhitePawn) {
-          set_at_2d(board->board, (Pieces[]){Blank}, m->end.row + 1,
-                    m->end.col);
+          set_at(board->board, (Pieces[]){Blank},
+                 (m->end.row + 1) * BOARD_ROW + m->end.col);
         } else {
-          set_at_2d(board->board, (Pieces[]){Blank}, m->end.row - 1,
-                    m->end.col);
+          set_at(board->board, (Pieces[]){Blank},
+                 (m->end.row - 1) * BOARD_ROW + m->end.col);
         }
       }
     }
