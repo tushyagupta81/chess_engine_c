@@ -39,11 +39,11 @@ void deinit_board(Board *board) {
   //   deinit_array(row); // free row->values
   // }
   deinit_array(board->board); // free outer array->values
-  free(board->castling);
+  // free(board->castling);
   free(board);
 }
 
-Board *new_board(char *fen) {
+Board *new_board(const char *fen) {
   Board *board = malloc(sizeof(Board));
   if (board == NULL) {
     fprintf(stderr, "Failed to allocated memory to board\n");
@@ -147,13 +147,29 @@ Board *new_board(char *fen) {
     exit(1);
   }
 
-  board->castling = malloc(sizeof(char) * 5);
-  if (board->castling == NULL) {
-    fprintf(stderr, "Failed to allocated memory to board->castling\n");
-    exit(1);
+  board->castling.BlackKingSide = false;
+  board->castling.BlackQueenSide = false;
+  board->castling.WhiteKingSide = false;
+  board->castling.WhiteQueenSide = false;
+
+  for (int i = start; i <= l; i++) {
+    if (fen[i] == 'k') {
+      board->castling.BlackKingSide = true;
+    } else if (fen[i] == 'K') {
+      board->castling.WhiteKingSide = true;
+    } else if (fen[i] == 'q') {
+      board->castling.BlackQueenSide = true;
+    } else if (fen[i] == 'Q') {
+      board->castling.WhiteQueenSide = true;
+    }
   }
-  memcpy(board->castling, fen + start, l - start);
-  board->castling[l - start] = '\0';
+  // board->castling = malloc(sizeof(char) * 5);
+  // if (board->castling == NULL) {
+  //   fprintf(stderr, "Failed to allocated memory to board->castling\n");
+  //   exit(1);
+  // }
+  // memcpy(board->castling, fen + start, l - start);
+  // board->castling[l - start] = '\0';
 
   // En passant information
   l += 1;
@@ -239,7 +255,7 @@ void print_board(Board *board) {
     // Array *row = get_at(board->board, i);
     printf("%d ", 8 - i);
     for (int j = 0; j < 8; j++) {
-      Pieces piece = *(Pieces *)get_at(board->board, i*BOARD_COL + j);
+      Pieces piece = *(Pieces *)get_at(board->board, i * BOARD_COL + j);
 
       // Choose background (chessboard pattern)
       if ((i + j) % 2 == 0)
@@ -264,7 +280,7 @@ void print_board(Board *board) {
 }
 
 void print_board_info(Board *board) {
-  printf("%-10s - '%s'\n", "castling", board->castling);
+  // printf("%-10s - '%s'\n", "castling", board->castling);
   printf("%-10s - %s\n", "check move", board->check_move ? "True" : "False");
   printf("%-10s - %s\n", "checkmate", board->checkmate ? "True" : "False");
   printf("%-10s - %d\n", "fullmoves", board->fullmoves);

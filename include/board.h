@@ -20,13 +20,20 @@ typedef struct {
   uint16_t col;
 } Enpassent;
 
+typedef struct{
+  bool WhiteKingSide;
+  bool WhiteQueenSide;
+  bool BlackKingSide;
+  bool BlackQueenSide;
+} Castle;
+
 typedef struct {
   Array *board;
   bool check_move;
   Player player;
   Position blackKing;
   Position whiteKing;
-  char *castling;
+  Castle castling;
   Enpassent enpassant;
   uint16_t halfmoves;
   uint16_t fullmoves;
@@ -36,7 +43,7 @@ typedef struct {
 #define INBOUNDS(r, c) ((r) < 8 && (c) < 8)
 #define GET_PIECE(r, c) *(Pieces *)get_at(board->board, r *BOARD_ROW + c)
 
-Board *new_board(char *fen);
+Board *new_board(const char *fen);
 void deinit_board(Board *board);
 void get_moves(Array *moves, Board *board, uint16_t i, uint16_t j);
 void get_check_moves(Array *moves, Board *board, uint16_t i, uint16_t j);

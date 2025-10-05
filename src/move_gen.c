@@ -84,8 +84,7 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
     }
 
     bool old_check_status = board->check_move;
-    char old_castling[5];
-    strcpy(old_castling, board->castling);
+    Castle old_castling = board->castling;
     Enpassent old_enpassent = board->enpassant;
     uint16_t old_halfmoves = board->halfmoves;
     uint16_t old_fullmoves = board->fullmoves;
@@ -157,7 +156,7 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
 
     board->player = player;
     board->check_move = old_check_status;
-    strcpy(board->castling, old_castling);
+    board->castling = old_castling;
     board->enpassant = old_enpassent;
     board->halfmoves = old_halfmoves;
     board->fullmoves = old_fullmoves;

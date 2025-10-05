@@ -1,2 +1,4 @@
 -I./include
 -I./unity
+-I./libtorch/include
+-I./libtorch/include/torch/csrc/api/include

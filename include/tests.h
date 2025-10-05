@@ -10,5 +10,6 @@ void test_enpassent();
 void test_check();
 void test_checkmate();
 void test_alpha_beta();
+void test_nn();
 
 #endif // !TESTS_H
