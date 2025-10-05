@@ -33,6 +33,117 @@ bool get_check_status(Board *board, Position *king) {
   return false;
 }
 
+bool board_to_fen(Board *board, char *fen) {
+  if (!board)
+    return false;
+
+  if (!fen) {
+    fprintf(stderr, "Failed to allocate memory for FEN string\n");
+    exit(1);
+  }
+  fen[0] = '\0';
+  int pos = 0;
+
+  // Board pieces
+  for (int i = 0; i < BOARD_ROW; i++) {
+    int empty = 0;
+    for (int j = 0; j < BOARD_COL; j++) {
+      Pieces p = *(Pieces *)get_at(board->board, i * BOARD_ROW + j);
+      char c = 0;
+      switch (p) {
+      case WhitePawn:
+        c = 'P';
+        break;
+      case WhiteKnight:
+        c = 'N';
+        break;
+      case WhiteBishop:
+        c = 'B';
+        break;
+      case WhiteRook:
+        c = 'R';
+        break;
+      case WhiteQueen:
+        c = 'Q';
+        break;
+      case WhiteKing:
+        c = 'K';
+        break;
+      case BlackPawn:
+        c = 'p';
+        break;
+      case BlackKnight:
+        c = 'n';
+        break;
+      case BlackBishop:
+        c = 'b';
+        break;
+      case BlackRook:
+        c = 'r';
+        break;
+      case BlackQueen:
+        c = 'q';
+        break;
+      case BlackKing:
+        c = 'k';
+        break;
+      case Blank:
+        empty++;
+        continue;
+      }
+      if (empty > 0) {
+        pos += sprintf(fen + pos, "%d", empty);
+        empty = 0;
+      }
+      fen[pos++] = c;
+    }
+    if (empty > 0) {
+      pos += sprintf(fen + pos, "%d", empty);
+    }
+    if (i != BOARD_ROW - 1) {
+      fen[pos++] = '/';
+    }
+  }
+
+  // Current player
+  fen[pos++] = ' ';
+  fen[pos++] = (board->player == White) ? 'w' : 'b';
+
+  // Castling rights
+  fen[pos++] = ' ';
+  int castling_added = 0;
+  if (board->castling.WhiteKingSide)
+    fen[pos++] = 'K', castling_added = 1;
+  if (board->castling.WhiteQueenSide)
+    fen[pos++] = 'Q', castling_added = 1;
+  if (board->castling.BlackKingSide)
+    fen[pos++] = 'k', castling_added = 1;
+  if (board->castling.BlackQueenSide)
+    fen[pos++] = 'q', castling_added = 1;
+  if (!castling_added)
+    fen[pos++] = '-';
+
+  // En passant
+  fen[pos++] = ' ';
+  if (board->enpassant.valid) {
+    fen[pos++] = 'a' + board->enpassant.col;
+    fen[pos++] = '8' - board->enpassant.row;
+  } else {
+    fen[pos++] = '-';
+  }
+
+  // Halfmove clock
+  fen[pos++] = ' ';
+  pos += sprintf(fen + pos, "%d", board->halfmoves);
+
+  // Fullmove number
+  fen[pos++] = ' ';
+  pos += sprintf(fen + pos, "%d", board->fullmoves);
+
+  fen[pos] = '\0';
+  return true;
+}
+
 void deinit_board(Board *board) {
   // for (int i = 0; i < 8; i++) {
   //   Array *row = *(Array **)get_at(board->board, i);
@@ -279,8 +390,25 @@ void print_board(Board *board) {
   printf("\n");
 }
 
+void castling_to_string(Board *board, char *out) {
+  int pos = 0;
+  if (board->castling.WhiteKingSide)
+    out[pos++] = 'K';
+  if (board->castling.WhiteQueenSide)
+    out[pos++] = 'Q';
+  if (board->castling.BlackKingSide)
+    out[pos++] = 'k';
+  if (board->castling.BlackQueenSide)
+    out[pos++] = 'q';
+  if (pos == 0)
+    out[pos++] = '-';
+  out[pos] = '\0'; // Null-terminate the string
+}
+
 void print_board_info(Board *board) {
-  // printf("%-10s - '%s'\n", "castling", board->castling);
+  char castling_str[5]; // Max 4 chars + null terminator
+  castling_to_string(board, castling_str);
+  printf("%-10s - '%s'\n", "castling", castling_str);
   printf("%-10s - %s\n", "check move", board->check_move ? "True" : "False");
   printf("%-10s - %s\n", "checkmate", board->checkmate ? "True" : "False");
   printf("%-10s - %d\n", "fullmoves", board->fullmoves);

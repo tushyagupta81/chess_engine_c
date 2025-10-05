@@ -3,6 +3,7 @@
 #include "eval.h"
 #include "memory.h"
 #include "moves.h"
+#include "nn_model.h"
 #include "pieces.h"
 #include "types.h"
 #include <limits.h>
@@ -33,6 +34,13 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
 
   if (depth >= MAX_DEPTH) {
     return get_board_score(board, get_opponent(player));
+    char fen[256];
+    if (!board_to_fen(board, fen)) {
+      return 0;
+    }
+    float nn_value = predict_fen(fen);
+    // Convert float to int for your alpha-beta return type
+    return (int)(nn_value * 1000);
   }
 
   Array *moves = new_array(ValueMoves);

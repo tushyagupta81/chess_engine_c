@@ -51,5 +51,6 @@ bool get_check_status(Board *board, Position *king);
 void print_board(Board *board);
 void print_board_info(Board *board);
 bool cmp_pos(Position *a, Position *b);
+bool board_to_fen(Board *board, char *fen);
 
 #endif // !BOARD_H
