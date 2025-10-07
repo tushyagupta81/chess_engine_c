@@ -4,11 +4,12 @@ import pandas as pd
 import os
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from stockfish import Stockfish
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
+import multiprocessing
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn, TimeRemainingColumn
 
 # Play a single game and return its moves
-def play_game(seed, max_moves_per_game=100):
-    random.seed(seed)
+def play_game(seed, max_moves_per_game=1000):
+    # random.seed(seed)
     engine = Stockfish(depth=5)
     board = chess.Board()
     for _ in range(random.randint(0, 5)):
@@ -32,16 +33,19 @@ def generate_data(num_games=100, output_csv="data/moves_dataset.csv"):
     os.makedirs("data", exist_ok=True)
     dataset = []
 
+    num_cpus = max(1, multiprocessing.cpu_count() // 2)
+
     with Progress(
         SpinnerColumn(),
         TextColumn("[bold green]{task.description}"),
         BarColumn(),
         TextColumn("{task.completed}/{task.total} games"),
         TimeElapsedColumn(),
+        TimeRemainingColumn()
     ) as progress:
         main_task = progress.add_task("Generating games", total=num_games)
 
-        with ProcessPoolExecutor() as executor:
+        with ProcessPoolExecutor(max_workers=num_cpus) as executor:
             futures = {executor.submit(play_game, seed): seed for seed in range(num_games)}
 
             for future in as_completed(futures):
