@@ -78,7 +78,7 @@ class AlphaZeroNet(nn.Module):
 # Train (chunked + Rich progress)
 # -----------------------------
 def train_model(csv_path, model_name="alphazero_chess", chunksize=50000):
-    device = torch.device("cpu")
+    device = "mps" if torch.backends.mps.is_available() else "cpu"
     model = AlphaZeroNet().to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     policy_criterion = nn.CrossEntropyLoss()

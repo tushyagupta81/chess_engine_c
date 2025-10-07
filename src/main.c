@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "move_gen.h"
 #include "moves.h"
+#include "nn_model.h"
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,6 +11,7 @@
 #include <string.h>
 
 int main() {
+  initialize_model();
   Board *board =
       new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
   // new_board("6k1/5ppp/8/8/8/8/8/R6K w KQkq - 0 15");

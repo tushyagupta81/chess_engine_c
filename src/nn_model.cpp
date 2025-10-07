@@ -10,6 +10,24 @@ extern "C" {
 #include <torch/script.h>
 #include <torch/torch.h>
 
+torch::jit::script::Module model;
+torch::Device device(torch::Device::Type::CPU); // or kCUDA if GPU is compatible
+bool is_init = false;
+bool valid_model = false;
+
+void initialize_model() {
+  is_init = true;
+  try {
+    valid_model = true;
+    model =
+        torch::jit::load("neural_net/models/alphazero_chess_jit.pth", device);
+  } catch (const c10::Error &e) {
+    std::cerr << "Error loading the model\n";
+  }
+}
+
+int model_is_valid() { return valid_model ? 1 : -1; }
+
 // -----------------------------
 // Convert FEN to 18x8x8 tensor
 // -----------------------------
@@ -91,15 +109,13 @@ torch::Tensor fen_to_tensor(const std::string &fen) {
 // Main prediction
 // -----------------------------
 float predict_fen(const char *fen) {
-  torch::Device device(
-      torch::Device::Type::CPU); // or kCUDA if GPU is compatible
 
   // Load scripted model
-  torch::jit::script::Module model;
-  try {
-    model = torch::jit::load("neural_net/models/alphazero_chess.pth", device);
-  } catch (const c10::Error &e) {
-    std::cerr << "Error loading the model\n";
+  if (!is_init) {
+    initialize_model();
+  }
+
+  if (model_is_valid() == -1) {
     return -1;
   }
 

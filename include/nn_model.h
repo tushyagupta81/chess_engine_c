@@ -7,6 +7,8 @@ extern "C" {
 
 // C-compatible wrapper function
 float predict_fen(const char* fen);
+int model_is_valid();
+void initialize_model();
 
 #ifdef __cplusplus
 }

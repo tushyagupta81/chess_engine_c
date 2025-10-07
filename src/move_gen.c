@@ -33,14 +33,16 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
   }
 
   if (depth >= MAX_DEPTH) {
-    return get_board_score(board, get_opponent(player));
+    if (model_is_valid() == -1) {
+      return get_board_score(board, get_opponent(player));
+    }
     char fen[256];
     if (!board_to_fen(board, fen)) {
       return 0;
     }
     float nn_value = predict_fen(fen);
     // Convert float to int for your alpha-beta return type
-    return (int)(nn_value * 1000);
+    return (int)(nn_value * INT_MAX);
   }
 
   Array *moves = new_array(ValueMoves);
