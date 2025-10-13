@@ -41,7 +41,7 @@ def main():
         train_model(
             args.data,
             model_name=args.model_name,
-            batch_size=64,
+            batch_size=512,
             device="mps" if torch.mps.is_available() else "cpu",
         )
 

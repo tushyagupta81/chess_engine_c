@@ -27,12 +27,10 @@ class ChessEvaluator(nn.Module):
 class ChessDataset(Dataset):
     def __init__(self, csv_file, king_reletive=False):
         self.df = pd.read_csv(csv_file)
+        self.king_reletive = king_reletive
         self.df = self.df.dropna()
         self.df = self.df.reset_index(drop=True)
-        if king_reletive:
-            self.X = [fen_to_king_relative(fen).float() for fen in self.df["FEN"]]
-        else:
-            self.X = [fen_to_tensor(fen).float() for fen in self.df["FEN"]]
+        self.X = [fen for fen in self.df["FEN"]]
         # Normalize centipawn targets
         self.y = [
             torch.clamp(torch.tensor(score / 1000.0, dtype=torch.float32), -10.0, 10.0)
@@ -43,4 +41,7 @@ class ChessDataset(Dataset):
         return len(self.X)
 
     def __getitem__(self, idx):
-        return self.X[idx], self.y[idx]
+        if self.king_reletive:
+            return fen_to_king_relative(self.X[idx]), self.y[idx]
+        else:
+            return fen_to_tensor(self.X[idx]), self.y[idx]

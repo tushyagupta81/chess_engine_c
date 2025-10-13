@@ -20,7 +20,7 @@ void initialize_model() {
   try {
     valid_model = true;
     model =
-        torch::jit::load("neural_net/models/alphazero_chess_jit.pth", device);
+        torch::jit::load("neural_net/working_models/king-reletive.pth", device);
   } catch (const c10::Error &e) {
     std::cerr << "Error loading the model\n";
   }
