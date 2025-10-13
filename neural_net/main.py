@@ -1,6 +1,6 @@
 import argparse
 from app.gen_data import generate_data
-from app.model import train_model
+from app.training import train_model
 
 def main():
     parser = argparse.ArgumentParser(
@@ -29,12 +29,6 @@ def main():
         default="alphazero_chess",
         help="Model name for saving and loading (default: alphazero_chess)"
     )
-    parser.add_argument(
-        "--chunksize",
-        type=int,
-        default=50000,
-        help="Number of rows per CSV chunk for training (default: 50000)"
-    )
 
     args = parser.parse_args()
 
@@ -45,7 +39,7 @@ def main():
     if args.train:
         print(f"Training model '{args.model_name}' using dataset {args.data}...")
         print(f"Chunk size: {args.chunksize}")
-        train_model(args.data, model_name=args.model_name, chunksize=args.chunksize)
+        train_model(args.data, model_name=args.model_name)
 
     if not args.generate and not args.train:
         print("No action specified. Use --generate N and/or --train.")

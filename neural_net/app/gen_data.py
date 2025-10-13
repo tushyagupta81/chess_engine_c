@@ -1,34 +1,42 @@
-import chess
-import random
-import pandas as pd
-import os
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from stockfish import Stockfish
 import multiprocessing
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn, TimeRemainingColumn
+import os
+import random
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
-# Play a single game and return its moves
-def play_game(seed, max_moves_per_game=1000):
-    # random.seed(seed)
+import chess
+import pandas as pd
+from rich.progress import (BarColumn, Progress, SpinnerColumn, TextColumn,
+                           TimeElapsedColumn, TimeRemainingColumn)
+from stockfish import Stockfish
+
+
+def play_game():
     engine = Stockfish(depth=5)
     board = chess.Board()
+
+    # randomize starting moves a bit
     for _ in range(random.randint(0, 5)):
         board.push(random.choice(list(board.legal_moves)))
 
     game_data = []
-    moves_played = 0
-    while not board.is_game_over() and moves_played < max_moves_per_game:
+    while not board.is_game_over():
         engine.set_fen_position(board.fen())
         top_moves = engine.get_top_moves(3)
+        if not top_moves:
+            break
         next_move = random.choice(top_moves)
+
         fen = board.fen()
-        game_data.append((fen, next_move["Move"]))
-        board.push(chess.Move.from_uci(next_move["Move"]))
-        moves_played += 1
+        game_data.append((fen, next_move["Centipawn"]))
 
-    return game_data, moves_played
+        move = chess.Move.from_uci(next_move["Move"])
+        if move not in board.legal_moves:
+            break
+        board.push(move)
 
-# Generate multiple games with progress
+    return game_data
+
+
 def generate_data(num_games=100, output_csv="data/moves_dataset.csv"):
     os.makedirs("data", exist_ok=True)
     dataset = []
@@ -41,19 +49,19 @@ def generate_data(num_games=100, output_csv="data/moves_dataset.csv"):
         BarColumn(),
         TextColumn("{task.completed}/{task.total} games"),
         TimeElapsedColumn(),
-        TimeRemainingColumn()
+        TimeRemainingColumn(),
     ) as progress:
         main_task = progress.add_task("Generating games", total=num_games)
 
         with ProcessPoolExecutor(max_workers=num_cpus) as executor:
-            futures = {executor.submit(play_game, seed): seed for seed in range(num_games)}
+            futures = [executor.submit(play_game) for _ in range(num_games)]
 
             for future in as_completed(futures):
-                game_data, moves_played = future.result()
+                game_data = future.result()
                 dataset.extend(game_data)
                 progress.update(main_task, advance=1)
 
-    df = pd.DataFrame(dataset, columns=["FEN", "move"])  # pyright: ignore[reportArgumentType]
+    df = pd.DataFrame(dataset, columns=["FEN", "Centipawn"])  # pyright: ignore[reportArgumentType]
     df.to_csv(output_csv, index=False)
     print(f"Generated {len(dataset)} positions and saved to {output_csv}")
 
