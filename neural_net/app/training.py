@@ -7,12 +7,14 @@ from app.model import ChessDataset, ChessEvaluator
 
 
 def train_model(
-    csv_path, epochs=10, batch_size=64, lr=1e-4, device="cpu", model_name="stockfish"
+    csv_path, epochs=10, batch_size=2048, lr=1e-4, device="cpu", model_name="stockfish"
 ):
-    dataset = ChessDataset(csv_path)
+    # dataset = ChessDataset(csv_path)
+    dataset = ChessDataset(csv_path, king_reletive=True)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    model = ChessEvaluator().to(device)
+    # model = ChessEvaluator().to(device)
+    model = ChessEvaluator(input_size=2700).to(device)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
@@ -25,16 +27,13 @@ def train_model(
             outputs = model(X_batch)
             loss = criterion(outputs.squeeze(), y_batch)
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
 
             running_loss += loss.item() * X_batch.size(0)
 
         epoch_loss = running_loss / len(dataset)
         print(f"Epoch {epoch + 1}/{epochs}, Loss: {epoch_loss:.6f}")
-
-    # Save trained model
-    torch.save(model.state_dict(), "chess_evaluator.pt")
-    print("Model saved as chess_evaluator.pt")
 
     # Save TorchScript JIT model for C++ inference
     scripted_model = torch.jit.script(model)

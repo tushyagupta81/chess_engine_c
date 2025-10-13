@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset
 
-from app.encoding import fen_to_tensor
+from app.encoding import fen_to_king_relative, fen_to_tensor
 
 
 class ChessEvaluator(nn.Module):
@@ -25,12 +25,17 @@ class ChessEvaluator(nn.Module):
 
 
 class ChessDataset(Dataset):
-    def __init__(self, csv_file):
+    def __init__(self, csv_file, king_reletive=False):
         self.df = pd.read_csv(csv_file)
-        self.X = [fen_to_tensor(fen).float() for fen in self.df["FEN"]]
+        self.df = self.df.dropna()
+        self.df = self.df.reset_index(drop=True)
+        if king_reletive:
+            self.X = [fen_to_king_relative(fen).float() for fen in self.df["FEN"]]
+        else:
+            self.X = [fen_to_tensor(fen).float() for fen in self.df["FEN"]]
         # Normalize centipawn targets
         self.y = [
-            torch.tensor(score / 1000.0, dtype=torch.float32)
+            torch.clamp(torch.tensor(score / 1000.0, dtype=torch.float32), -10.0, 10.0)
             for score in self.df["Centipawn"]
         ]
 
