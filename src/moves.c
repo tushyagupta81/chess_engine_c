@@ -2,6 +2,7 @@
 #include "board.h"
 #include "memory.h"
 #include "pieces.h"
+#include "stdio.h"
 #include "types.h"
 #include <ctype.h>
 #include <stdint.h>
@@ -22,9 +23,39 @@ void pseudo_do_move(Board *board, Move *move) {
   if (move->start_piece == WhiteKing) {
     board->whiteKing.row = move->end.row;
     board->whiteKing.col = move->end.col;
+    if (abs(move->end.col - move->start.col) >= 2) {
+      if (move->end.col > move->start.col) {
+        set_at(board->board, (Pieces[]){WhiteRook},
+               move->end.row * BOARD_ROW + move->end.col - 1);
+        set_at(board->board, (Pieces[]){Blank},
+               move->end.row * BOARD_ROW + move->end.col + 1);
+      } else {
+        set_at(board->board, (Pieces[]){WhiteRook},
+               move->end.row * BOARD_ROW + move->end.col + 1);
+        set_at(board->board, (Pieces[]){Blank},
+               move->end.row * BOARD_ROW + move->end.col - 2);
+      }
+    }
+    board->castling.WhiteKingSide = false;
+    board->castling.WhiteQueenSide = false;
   } else if (move->start_piece == BlackKing) {
     board->blackKing.row = move->end.row;
     board->blackKing.col = move->end.col;
+    if (abs(move->end.col - move->start.col) >= 2) {
+      if (move->end.col > move->start.col) {
+        set_at(board->board, (Pieces[]){BlackRook},
+               move->end.row * BOARD_ROW + move->end.col - 1);
+        set_at(board->board, (Pieces[]){Blank},
+               move->end.row * BOARD_ROW + move->end.col + 1);
+      } else {
+        set_at(board->board, (Pieces[]){BlackRook},
+               move->end.row * BOARD_ROW + move->end.col + 1);
+        set_at(board->board, (Pieces[]){Blank},
+               move->end.row * BOARD_ROW + move->end.col - 2);
+      }
+    }
+    board->castling.BlackKingSide = false;
+    board->castling.BlackQueenSide = false;
   }
 }
 
@@ -32,9 +63,35 @@ void undo_move(Board *board, Move *move) {
   if (move->start_piece == WhiteKing) {
     board->whiteKing.row = move->start.row;
     board->whiteKing.col = move->start.col;
+    if (abs(move->end.col - move->start.col) >= 2) {
+      if (move->end.col > move->start.col) {
+        set_at(board->board, (Pieces[]){Blank},
+               move->end.row * BOARD_ROW + move->end.col - 1);
+        set_at(board->board, (Pieces[]){WhiteRook},
+               move->end.row * BOARD_ROW + move->end.col + 1);
+      } else {
+        set_at(board->board, (Pieces[]){Blank},
+               move->end.row * BOARD_ROW + move->end.col + 1);
+        set_at(board->board, (Pieces[]){WhiteRook},
+               move->end.row * BOARD_ROW + move->end.col - 2);
+      }
+    }
   } else if (move->start_piece == BlackKing) {
     board->blackKing.row = move->start.row;
     board->blackKing.col = move->start.col;
+    if (abs(move->end.col - move->start.col) >= 2) {
+      if (move->end.col > move->start.col) {
+        set_at(board->board, (Pieces[]){Blank},
+               move->end.row * BOARD_ROW + move->end.col - 1);
+        set_at(board->board, (Pieces[]){BlackRook},
+               move->end.row * BOARD_ROW + move->end.col + 1);
+      } else {
+        set_at(board->board, (Pieces[]){Blank},
+               move->end.row * BOARD_ROW + move->end.col + 1);
+        set_at(board->board, (Pieces[]){BlackRook},
+               move->end.row * BOARD_ROW + move->end.col - 2);
+      }
+    }
   }
   set_at(board->board, &move->end_piece,
          move->end.row * BOARD_ROW + move->end.col);
@@ -72,12 +129,15 @@ bool checkmate(Board *board) {
   }
   for (int i = 0; i < moves->curr_length; i++) {
     Move m = *(Move *)get_at(moves, i);
+    Castle old_temp = board->castling;
     pseudo_do_move(board, &m);
     if (board->player == Black) {
       if (get_check_status(board, &board->blackKing) == true) {
         undo_move(board, &m);
+        board->castling = old_temp;
       } else {
         undo_move(board, &m);
+        board->castling = old_temp;
         deinit_array(moves);
         deinit_array(positions);
         return false;
@@ -85,8 +145,10 @@ bool checkmate(Board *board) {
     } else {
       if (get_check_status(board, &board->whiteKing) == true) {
         undo_move(board, &m);
+        board->castling = old_temp;
       } else {
         undo_move(board, &m);
+        board->castling = old_temp;
         deinit_array(moves);
         deinit_array(positions);
         return false;
@@ -259,10 +321,12 @@ bool do_move(Board *board, char *move_string) {
     return false;
   }
 
+  Castle old_temp = board->castling;
   pseudo_do_move(board, &move);
 
   if (check_check(board, true)) {
     undo_move(board, &move);
+    board->castling = old_temp;
     return false;
   }
 

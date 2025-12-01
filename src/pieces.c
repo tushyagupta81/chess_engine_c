@@ -143,6 +143,19 @@ void get_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
         ADD_MOVES(i + dr[k], j + dc[k]);
       }
     }
+    if (board->castling.WhiteKingSide &&
+        get_piece_color(board, i, j + 1) == None &&
+        get_piece_color(board, i, j + 2) == None &&
+        GET_PIECE(i, j + 3) == WhiteRook) {
+      ADD_MOVES(i, j + 2);
+    }
+    if (board->castling.WhiteQueenSide &&
+        get_piece_color(board, i, j - 1) == None &&
+        get_piece_color(board, i, j - 2) == None &&
+        get_piece_color(board, i, j - 3) == None &&
+        GET_PIECE(i, j - 4) == WhiteRook) {
+      ADD_MOVES(i, j - 2);
+    }
     break;
   }
   case BlackKing: {
@@ -153,6 +166,19 @@ void get_moves(Array *moves, Board *board, uint16_t i, uint16_t j) {
       if (piece_color != Black && piece_color != OutOfBounds) {
         ADD_MOVES(i + dr[k], j + dc[k]);
       }
+    }
+    if (board->castling.BlackKingSide &&
+        get_piece_color(board, i, j + 1) == None &&
+        get_piece_color(board, i, j + 2) == None &&
+        GET_PIECE(i, j + 3) == BlackRook) {
+      ADD_MOVES(i, j + 2);
+    }
+    if (board->castling.BlackQueenSide &&
+        get_piece_color(board, i, j - 1) == None &&
+        get_piece_color(board, i, j - 2) == None &&
+        get_piece_color(board, i, j - 3) == None &&
+        GET_PIECE(i, j - 4) == BlackRook) {
+      ADD_MOVES(i, j - 2);
     }
     break;
   }

@@ -33,6 +33,7 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
   }
 
   if (depth >= MAX_DEPTH) {
+    return get_board_score(board, get_opponent(player));
     if (model_is_valid() == -1) {
       return get_board_score(board, get_opponent(player));
     }
@@ -86,10 +87,12 @@ int alpha_beta(Board *board, bool maximizingPlayer, Player player, int alpha,
 
   for (int i = 0; i < moves->curr_length; i++) {
     Move *m = (Move *)get_at(moves, i);
+    Castle temp_old = board->castling;
     pseudo_do_move(board, m);
 
     if (check_check(board, false)) {
       undo_move(board, m);
+      board->castling = temp_old;
       continue;
     }
 

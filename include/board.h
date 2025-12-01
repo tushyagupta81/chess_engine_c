@@ -20,7 +20,7 @@ typedef struct {
   uint16_t col;
 } Enpassent;
 
-typedef struct{
+typedef struct {
   bool WhiteKingSide;
   bool WhiteQueenSide;
   bool BlackKingSide;
@@ -40,7 +40,7 @@ typedef struct {
   bool checkmate;
 } Board;
 
-#define INBOUNDS(r, c) ((r) < 8 && (c) < 8)
+#define INBOUNDS(r, c) ((r) < 8 && (c) < 8 && (r) >= 0 && (c) >= 0)
 #define GET_PIECE(r, c) *(Pieces *)get_at(board->board, r *BOARD_ROW + c)
 
 Board *new_board(const char *fen);

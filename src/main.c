@@ -13,7 +13,7 @@
 int main() {
   initialize_model();
   Board *board =
-      new_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0");
+      new_board("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 0");
   // new_board("6k1/5ppp/8/8/8/8/8/R6K w KQkq - 0 15");
   print_board(board);
   print_board_info(board);
@@ -59,7 +59,9 @@ int main() {
       break;
     }
     uint64_t now = now_ms();
+    Castle old_temp = board->castling;
     alpha_beta(board, true, board->player, INT_MIN, INT_MAX, 0, move);
+    board->castling = old_temp;
     if (auto_move) {
       int sleep_period = AUTO_MODE_GAP - (now_ms() - now);
       if (sleep_period > 0) {
